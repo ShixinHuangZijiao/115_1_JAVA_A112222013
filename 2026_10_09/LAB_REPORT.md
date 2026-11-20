@@ -205,8 +205,8 @@ TODO 4、5 已完成：摘要印 `steps, ok, rejected, ignored`；energyLog 為�
 - commit、push，核對 GitHub main 最新 commit。
 - 在另一位置 clone，重新編譯並執行 MissionLog。
 
-GitHub repo/作業目錄：https://github.com/ShixinHuangZijiao/115_1_JAVA_A112222013 ／ `2026_10_09/`；最終 commit：待推送後填寫。
-本人新副本 JDK/編譯/預設輸出：待推送後填寫。
+GitHub repo/作業目錄：https://github.com/ShixinHuangZijiao/115_1_JAVA_A112222013 ／ `2026_10_09/`；最終 commit：作業 commit `fba08b3`（完成第四週作業）已 push 到 origin/main；本段驗證紀錄另以後續 commit 補上。
+本人新副本 JDK/編譯/預設輸出：從 GitHub clone 到另一個本機暫存資料夾（原副本未刪），HEAD 為 `fba08b3`；JDK 21.0.13.1；在 `2026_10_09/java-04` 執行 `javac -encoding UTF-8 -d out src/*.java` 與 `java -cp out MissionLog`，輸出 3 步回放、counts[0..3]=[0, 2, 1, 0]、steps=3, ok=3, rejected=0, ignored=0、lowest energy=6、final energy=6, samples=5, actionCount=3 -> SUCCESS、battery=30.0，與預期一致。
 
 ## 課後選做
 
