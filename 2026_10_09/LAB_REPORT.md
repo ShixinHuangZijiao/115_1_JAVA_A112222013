@@ -207,8 +207,8 @@ TODO 4、5 已完成：用 `Collections.frequency(resultLog, "成功")`、`Colle
 - commit、push，核對 GitHub main 最新 commit。
 - 在另一位置 clone，重新編譯並執行 MissionLog。
 
-GitHub repo/作業目錄：https://github.com/ShixinHuangZijiao/115_1_JAVA_A112222013 ／ `2026_10_09/`；最終 commit：待推送後填寫。
-本人新副本 JDK/編譯/預設輸出：待推送後填寫。
+GitHub repo/作業目錄：https://github.com/ShixinHuangZijiao/115_1_JAVA_A112222013 ／ `2026_10_09/`；最終 commit：中文版作業 commit `f56f140`（第四週改用老師新版中文教材）已 push 到 origin/main；本段驗證紀錄另以後續 commit 補上。舊版英文作業的 commit 為 `fba08b3`。
+本人新副本 JDK/編譯/預設輸出：從 GitHub clone 到另一個本機暫存資料夾（原副本未刪），HEAD 為 `f56f140`；JDK 21.0.13.1；在 `2026_10_09/java-04` 執行 `javac -encoding UTF-8 -d out src/*.java` 與 `java -Dstdout.encoding=UTF-8 -cp out MissionLog`，輸出 3 步中文回放（能源 14、8、6）、指令次數[0..3]=[0, 2, 1, 0]、步數=3, 成功=3, 拒絕=0, 略過=0、最低能源=6、最終能源=6, 樣本數=5, 行動次數=3 -> 任務成功、電量百分比=30.0，與預期一致。
 
 ## 課後選做
 
