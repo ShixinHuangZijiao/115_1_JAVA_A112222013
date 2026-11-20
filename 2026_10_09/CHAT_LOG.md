@@ -10,6 +10,7 @@
 4. AI 先把 starter 和五個核心 examples 複製到 `2026_10_09/java-04/src`，再完成 MissionLog 的 TODO 1–5。
 5. AI 實際編譯執行：六條必做路線、五筆固定狀態、講義 B–D 的陣列與 ArrayList 實驗，以及 F3 的模擬錯誤（刪掉範圍檢查 → counts[9] 越界），結果都與投影片答案一致，再填寫 LAB_REPORT、AI_USAGE、README。
 6. 我請 AI 用 VS Code 打開專案，自己檢查程式和報告後，才讓 AI 推送。
+7. 做第五週時，AI 比對後發現老師發布了新版教材：第四週的結果代碼與報表都改成繁體中文（邏輯不變）。我決定第四週也改成中文版，AI 用新版 starter 與 examples 重新完成 TODO 1–5，重跑所有測試並更新報告。
 
 ## 截圖
 
