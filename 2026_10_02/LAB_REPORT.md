@@ -119,7 +119,7 @@ AI 除錯選第 1 題（探索條件改成 `energy > 6`）。預測會錯的輸�
 - [x] 已有副本，作業前確認與 origin/main 同步。
 - [x] 以不同本機路徑建立全新 clone，在 java-03 重編譯並跑 1、1、2。
 
-最新 commit／遠端核對：待推送後填寫。全新 clone 路徑、版本、指令、結果：待推送後填寫。未完成事項：無。
+最新 commit／遠端核對：作業 commit `d934545`（完成第三週作業）已 push 到 origin/main；本段驗證紀錄另以後續 commit 補上。全新 clone 路徑、版本、指令、結果：從 GitHub clone 到另一個本機暫存資料夾（不同於原 repo 路徑，原副本未刪），clone 內 HEAD 為 `d934545`；JDK 21.0.13；在 `2026_10_02/java-03` 執行 `javac --release 21 -encoding UTF-8 -d out src/*.java` 與 `java -cp out RoverMission`，輸入 1、1、2，結果 energy=6, samples=5, actionCount=3, SUCCESS，與預期一致。未完成事項：無。
 
 ## G｜課後選做
 
