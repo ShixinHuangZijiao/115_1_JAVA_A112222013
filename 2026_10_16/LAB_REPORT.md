@@ -302,8 +302,8 @@ MissionStep second = new MissionStep(2, 12, "能源不足");
 - `java-05/src` 共 8 個 Java 檔（examples 6 檔＋完成的 MissionStep、MissionLog）；`java-05/README.md`、本報告、AI_USAGE.md 已完成。out、.class 由 .gitignore 排除。
 - commit、push 後到遠端核對，另取回新副本重新編譯。
 
-GitHub repo／作業目錄：https://github.com/ShixinHuangZijiao/115_1_JAVA_A112222013 ／ `2026_10_16/`；最終 commit：待推送後填寫。
-新副本 JDK／編譯／預設輸出：待推送後填寫。
+GitHub repo／作業目錄：https://github.com/ShixinHuangZijiao/115_1_JAVA_A112222013 ／ `2026_10_16/`；最終 commit：作業 commit `eff420c`（完成第五週作業）已 push 到 origin/main；本段驗證紀錄另以後續 commit 補上。
+新副本 JDK／編譯／預設輸出：從 GitHub clone 到另一個本機暫存資料夾（原副本未刪），HEAD 為 `eff420c`，src 有 8 個 Java 檔；JDK 21.0.13.1；在 `2026_10_16/java-05` 執行 `javac -encoding UTF-8 -d out src/*.java` 與 `java -Dstdout.encoding=UTF-8 -cp out MissionLog`，回放能源 14、8、6，指令次數[0..3]=[0, 2, 1, 0]，步數=3, 成功=3, 拒絕=0, 略過=0，最低能源=6，最終能源=6, 樣本數=5, 行動次數=3 -> 任務成功，電量百分比=30.0，與預期一致。
 
 ## 選做
 
