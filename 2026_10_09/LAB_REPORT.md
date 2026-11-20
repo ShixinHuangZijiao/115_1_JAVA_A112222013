@@ -1,0 +1,213 @@
+# 第四週學生實作：火星探測車任務日誌
+
+姓名：待填　學號：A112222013　實際上課日期：2026/10/09　實際 JDK：openjdk 21.0.13.1（javac 21.0.13.1，Microsoft Build）
+
+所有「實際」欄位都是本機實際執行的輸出；做錯誤實驗時都使用暫存副本，`java-04/src` 內的繳交版沒有被改動。課程 repo 的 week04 沒有 assignment.md，需求以講義與投影片為準。
+
+## A｜取回與先備診斷
+
+1. 使用既有 repo `115_1_JAVA_A112222013`，確認與 origin/main 同步。在 repo 根目錄建立 `2026_10_09/java-04/src`（repo 根目錄相當於講義的 115_1_Java）。
+2. 放入五個核心 examples（ArrayBasics、CommandCounter、ArrayReference、ListBasics、CollectionsDemo）與 starter/MissionLog.java；本報告與 AI_USAGE 放在日期資料夾下。
+3. `java -version`：openjdk version "21.0.13.1" 2026-11-17 LTS；`javac -version`：javac 21.0.13.1。
+4. 在 java-04 執行 `javac -encoding UTF-8 -d out src/*.java` 編譯成功，再執行 `java -cp out MissionLog`。
+
+診斷：第三週 {1,1,2} 的最終能源/樣本/成功行動次數：6/5/3。{2,1,1} 是否相同：相同（20→18→12→6，樣本 1→3→5，也是 3 次），也是 6/5/3。只有最終三個數字，能否分辨路線：不能，兩條路線的終點完全一樣，必須保存每一步才能回放。
+
+## B｜固定資料：陣列與計數
+
+| 項目 | 預測 | 本人實際結果 |
+|---|---|---|
+| script.length | 3 | length=3 |
+| new int[4] 內容 | [0, 0, 0, 0] | counts=[0, 0, 0, 0] |
+| new String[2] 內容 | [null, null] | labels=[null, null] |
+| 逐步指令輸出 | step 1: 1／step 2: 1／step 3: 2 | step 1: 1、step 2: 1、step 3: 2 |
+| 指令數值加總（不是行動數） | 4 | sum=4 |
+
+1. length 是欄位，不加括號；陣列合法索引範圍是：0 ≤ i < length，也就是 0 到 length-1（本例 0–2）。
+2. 在副本取消越界行註解：編譯成功，執行時發生 `ArrayIndexOutOfBoundsException: Index 3 out of bounds for length 3`，是執行時錯誤，不是編譯錯誤。副本已丟棄，繳交版未改。
+3. CommandCounter 腳本 {3,9,0,1,1,-1}，預測 counts：[1, 2, 0, 1]；實際：counts=[1, 2, 0, 1]。9 和 -1 為何不得當索引：counts 只有索引 0–3，用 9 或 -1 當索引會越界丟例外，所以要先檢查範圍。
+4. 改為 {0,2,2,3}，預測：[1, 0, 2, 1]；實際：counts=[1, 0, 2, 1]；副本已丟棄，原示範未改。
+5. 在 `for (int command : script)` 內寫 command=0，是否改掉 script 的元素：不會，command 只是每個元素值的複製。用副本檢查：迴圈後印出 script 仍是 [1, 1, 2]。
+
+## C｜參考與方法
+
+| 時間點 | 預測 energy 內容 | 本人實際 |
+|---|---|---|
+| alias[0]=19 後 | [19, 14, 8] | alias change=[19, 14, 8] |
+| changeFirst 後 | [18, 14, 8] | element change=[18, 14, 8] |
+| replaceLocal 內的新陣列 | [20, 20, 20] | inside local replace=[20, 20, 20] |
+| 回到 main 後 | [18, 14, 8] | after local replace=[18, 14, 8] |
+| == 與 Arrays.equals 的兩個結果 | false／true | same reference=false、same content=true |
+
+Java 傳值；陣列參數取得的是：參考值的副本（指向同一個陣列）。為何修改元素看得見，重新指定參數卻不改呼叫端：改元素是透過同一個參考修改同一個陣列，呼叫端看得到；重新指定只是讓方法內的區域變數指向新陣列，呼叫端的變數仍指向原陣列。
+
+## D｜筆數會增加：ArrayList
+
+| 項目 | 預測 | 本人實際 |
+|---|---|---|
+| 原清單/size/first | [1, 1, 2]／3／1 | commands=[1, 1, 2], size=3、first=1 |
+| set(1,3) 後 | [1, 3, 2] | after set=[1, 3, 2] |
+| remove(0) 後 | [3, 2] | after remove index=[3, 2] |
+| remove(Integer.valueOf(3)) 後 | [2] | after remove value=[2] |
+| isEmpty() | false | empty=false |
+
+ArrayList<int> 為何不能編譯：泛型的型態參數必須是參考型態，int 是基本型態，要用 Integer。在副本取消註解後實際編譯訊息為 `error: unexpected type ... required: reference`；副本已丟棄，繳交版可正常編譯。
+
+## E｜新增、回放、計數
+
+已依 2→3→1 完成 TODO 2（每步 add 三欄）、TODO 3（同索引回放）、TODO 1（範圍檢查後計數），F1 再完成 TODO 4、5。
+
+{3,9,0} 的逐步追蹤：
+
+| 步 | 指令 | 預測結果/執行後能源 | 本人實際結果/能源 |
+|---|---|---|---|
+| 1 | 3 | ALREADY_FULL／20 | ALREADY_FULL／20 |
+| 2 | 9 | UNKNOWN_COMMAND／20 | UNKNOWN_COMMAND／20 |
+| 3 | 0 | RETURN／20 | RETURN／20 |
+
+此時 commandLog/energyLog/resultLog 各有幾筆：各 3 筆。actionCount 是幾次：0 次。差異原因：日誌記錄每一筆讀到的指令（含拒絕、無效、返回），actionCount 只計算成功的行動。
+
+| script | 預期狀態/結果 | 本人實際狀態/結果 | counts、摘要、每筆回放均相符？ |
+|---|---|---|---|
+| {0} | 20/0/0 RETURNED | 20/0/0 RETURNED | 是 |
+| {1,1,2} | 6/5/3 SUCCESS | 6/5/3 SUCCESS | 是 |
+| {2,2,2,2,2} | 10/5/5 SUCCESS | 10/5/5 SUCCESS | 是 |
+| {3,9,0} | 20/0/0 RETURNED | 20/0/0 RETURNED | 是 |
+| {1,1,1,1} | 2/6/3 SUCCESS | 2/6/3 SUCCESS | 是（ignored=1，第四筆未讀） |
+| {2,1} | 12/3/2 UNFINISHED | 12/3/2 UNFINISHED | 是 |
+
+完整輸出（每列在副本修改 main 的 script 後重新編譯；繳交版維持 {1,1,2}）：
+
+```text
+######## script={0}
+=== replay ===
+step 1: command=0, result=RETURN, energy=20
+counts[0..3]=[1, 0, 0, 0]
+steps=1, ok=0, rejected=0, ignored=0
+lowest energy=20
+final energy=20, samples=0, actionCount=0 -> RETURNED
+battery=100.0
+######## script={1, 1, 2}
+=== replay ===
+step 1: command=1, result=OK, energy=14
+step 2: command=1, result=OK, energy=8
+step 3: command=2, result=OK, energy=6
+counts[0..3]=[0, 2, 1, 0]
+steps=3, ok=3, rejected=0, ignored=0
+lowest energy=6
+final energy=6, samples=5, actionCount=3 -> SUCCESS
+battery=30.0
+######## script={2, 2, 2, 2, 2}
+=== replay ===
+step 1: command=2, result=OK, energy=18
+step 2: command=2, result=OK, energy=16
+step 3: command=2, result=OK, energy=14
+step 4: command=2, result=OK, energy=12
+step 5: command=2, result=OK, energy=10
+counts[0..3]=[0, 0, 5, 0]
+steps=5, ok=5, rejected=0, ignored=0
+lowest energy=10
+final energy=10, samples=5, actionCount=5 -> SUCCESS
+battery=50.0
+######## script={3, 9, 0}
+=== replay ===
+step 1: command=3, result=ALREADY_FULL, energy=20
+step 2: command=9, result=UNKNOWN_COMMAND, energy=20
+step 3: command=0, result=RETURN, energy=20
+counts[0..3]=[1, 0, 0, 1]
+steps=3, ok=0, rejected=2, ignored=0
+lowest energy=20
+final energy=20, samples=0, actionCount=0 -> RETURNED
+battery=100.0
+######## script={1, 1, 1, 1}
+=== replay ===
+step 1: command=1, result=OK, energy=14
+step 2: command=1, result=OK, energy=8
+step 3: command=1, result=OK, energy=2
+counts[0..3]=[0, 3, 0, 0]
+steps=3, ok=3, rejected=0, ignored=1
+lowest energy=2
+final energy=2, samples=6, actionCount=3 -> SUCCESS
+battery=10.0
+######## script={2, 1}
+=== replay ===
+step 1: command=2, result=OK, energy=18
+step 2: command=1, result=OK, energy=12
+counts[0..3]=[0, 1, 1, 0]
+steps=2, ok=2, rejected=0, ignored=0
+lowest energy=12
+final energy=12, samples=3, actionCount=2 -> UNFINISHED
+battery=60.0
+```
+
+## F｜摘要、需求與反例
+
+### F1 Collections 與 TODO 4–5
+
+CollectionsDemo 預測 min/max/frequency：6／20／1；實際：min=6、max=20、frequency(8)=1。排序後 original：[14, 8, 20, 6]；sorted：[6, 8, 14, 20]。為何不能只排序 energyLog 來做回放：三條清單靠同一索引對應同一步，只排序 energyLog 會讓能源和指令、結果錯配，也失去時間順序。
+
+TODO 4、5 已完成：摘要印 `steps, ok, rejected, ignored`；energyLog 為空時印 `lowest energy=N/A`，否則用 Collections.min。
+
+教師固定狀態示範（我沒有看到教師現場示範，以下全部是**本人複驗**：在副本把 runMission 的初始值與 script 改成表列數值後執行）：
+
+| 初始 energy/samples；script | 預測結果/日誌筆數/最低能源 | 教師實際示範觀察 |
+|---|---|---|
+| 5/0；{1,3,0} | 10/0/1 RETURNED／3 筆／5 | 本人複驗：10/0/1 RETURNED，3 筆（NOT_ENOUGH_ENERGY、OK、RETURN），lowest energy=5 |
+| 2/4；{2} | 0/5/1 SUCCESS／1 筆／0 | 本人複驗：0/5/1 SUCCESS，1 筆，lowest energy=0 |
+| 0/0；{3,1} | EXHAUSTED／0 筆／N/A | 本人複驗：0/0/0 EXHAUSTED，0 筆，ignored=2，lowest energy=N/A |
+| 20/5；{1} | SUCCESS／0 筆／N/A | 本人複驗：20/5/0 SUCCESS，0 筆，ignored=1，lowest energy=N/A |
+| 20/0；{} | UNFINISHED／0 筆／N/A | 本人複驗：20/0/0 UNFINISHED，0 筆，lowest energy=N/A |
+
+### F2 Prompt 設計
+
+| 要交代的需求 | 本人的內容 |
+|---|---|
+| 欄位與型態 | 每一步三個欄位：指令 int、行動執行後的能源 int、結果 String（OK／NOT_ENOUGH_ENERGY／ALREADY_FULL／UNKNOWN_COMMAND／RETURN） |
+| 筆數是否事先固定 | 不固定；每讀一筆指令就新增一筆，任務可能提早結束。目前用固定腳本有上限，未來可能改成互動輸入 |
+| 是否保留順序 | 必須保留，回放要依執行順序 |
+| 是否容許重複 | 必須容許，同一指令可重複執行（例如連續探索） |
+| 新增、回放、計數與最低值等操作 | 每步新增三欄；依索引回放；統計 0–3 指令次數（無效指令不計）；計算 OK、RETURN、rejected、ignored；求每步結束後的最低能源，空日誌顯示 N/A |
+| 允許的技術與驗證案例 | 只用陣列、ArrayList、Collections（min、frequency）、一般 for 與加強版 for；不自訂類別、不用 Stream。驗證：{3,9,0} 應得 3 筆、counts=[1,0,0,1]、rejected=2；空腳本應得 lowest energy=N/A；{1,1,2} 應得 6/5/3 SUCCESS |
+
+完整 Prompt：「我在寫 Java 的火星探測車任務日誌。每執行一步要保存三個欄位：指令（int）、行動後能源（int）、結果字串；拒絕、無效指令和返回也要記錄。筆數事先不固定，任務可能提早結束，日誌必須保留執行順序，也要允許重複指令。需要的操作是：逐筆新增、依索引回放每一步、統計 0–3 四種指令的次數（9、-1 等無效指令不計）、用 Collections.frequency 算 OK 與 RETURN 筆數、用 Collections.min 找最低能源，空日誌要顯示 N/A。請只用陣列、ArrayList、Collections 和一般 for，不要自訂類別或用 Stream。請說明你選擇的資料結構為什麼符合這些需求，並給一個邊界反例，例如 {3,9,0} 或空腳本，我會自己編譯驗證。」
+
+判讀**模擬建議**：
+
+| 建議 | 採納/拒絕/補充條件與理由 |
+|---|---|
+| 歷程最多用 int[100] 保存就好 | 補充條件後才可用：陣列能保存有限歷程，但要另外記有效筆數 used，不能把預設值 0 當成「返回」；還要規定滿 100 筆時怎麼處理（拒絕新增或擴充）。固定腳本可以用等長陣列，但日誌未來可能改成互動輸入、筆數不定，ArrayList 的 size() 自動管理筆數比較適合，所以本作業不採用。 |
+| ArrayList 保存日誌，HashSet 保存指令，避免重複 | 拒絕 HashSet 的部分：任務可以重複探索，回放需要每一步的順序與重複；HashSet 會去掉重複、也不保證順序，只能回答「出現過哪些指令」，不能回放路線。日誌維持用 ArrayList。 |
+
+### F3 模擬 AI 除錯二選一
+
+選第 1 項（刪掉 countCommands 的範圍檢查）。另外也順手驗證了第 2 項：把 `<` 改成 `<=`，用 {0} 測試，結果是 get(1) 拋出 `IndexOutOfBoundsException: Index 1 out of bounds for length 1`，所以第 2 項也應拒絕。
+
+| 證據 | 本人紀錄 |
+|---|---|
+| 選哪種建議與反例；預期行為 | 第 1 項，理由是「指令只有 0–3」。反例 {3,9,0}：日誌也會記錄無效指令 9，預期刪掉檢查後 counts[9] 會越界 |
+| 修改前實際結果/錯誤訊息 | 副本把條件改成 `if (true)`：回放三步正常印出，接著 `ArrayIndexOutOfBoundsException: Index 9 out of bounds for length 4`（at MissionLog.countCommands），counts 和摘要都沒印出來 |
+| 最小修正與採納/拒絕理由 | 拒絕這個建議。日誌會記錄無效指令，所以 commandLog 裡可能有 9、-1；恢復 `if (command >= 0 && command < counts.length)` 再 `counts[command]++` |
+| 修正後反例實際結果 | {3,9,0}：counts[0..3]=[1, 0, 0, 1]、steps=3, ok=0, rejected=2, ignored=0、20/0/0 RETURNED |
+| 修正後 {1,1,2} | 6/5/3 SUCCESS，counts=[0, 2, 1, 0]（見 E 的完整輸出） |
+| 修正後 {3,9,0} | 20/0/0 RETURNED，counts=[1, 0, 0, 1]（見 E 的完整輸出） |
+
+## G｜課末檢核與第五週入口
+
+1. length、size()、length() 分別用於什麼：length 是陣列的欄位（不加括號）；size() 是 ArrayList 等集合的筆數方法；length() 是 String 的字元數方法。
+2. 三筆日誌是否必定代表三次成功行動：不一定。{3,9,0} 有三筆日誌，但成功行動 0 次。
+3. 三條清單漏加其中一筆會發生什麼：同一個索引不再代表同一步，回放會錯配；較短的清單在回放時可能 get 越界。
+4. 為何固定四種指令計數用陣列，逐步增加的日誌用 ArrayList：指令種類固定 4 種，長度不會變，陣列直接用指令當索引最簡單；日誌筆數會隨執行增加、事先不知道，ArrayList 可以 add，用 size() 就知道筆數。
+5. 下週如何把同一步三個欄位整合在一起：設計一個類別（例如 MissionStep），把指令、能源、結果當作欄位，用建構子建立，再用一條 ArrayList 保存每一步的物件。本週不寫。
+
+## H｜保存、推送與取回
+
+- 繳交版 MissionLog 維持預設腳本 {1,1,2}，重新編譯執行通過；LAB_REPORT、AI_USAGE、java-04/README.md 已完成。
+- commit、push，核對 GitHub main 最新 commit。
+- 在另一位置 clone，重新編譯並執行 MissionLog。
+
+GitHub repo/作業目錄：https://github.com/ShixinHuangZijiao/115_1_JAVA_A112222013 ／ `2026_10_09/`；最終 commit：待推送後填寫。
+本人新副本 JDK/編譯/預設輸出：待推送後填寫。
+
+## 課後選做
+
+未做。
