@@ -1,0 +1,29 @@
+@startuml
+!pragma layout smetana
+skinparam classAttributeIconSize 0
+skinparam defaultFontName "Microsoft JhengHei"
+hide circle
+
+title E1｜樣本運送盒 人工初版
+
+class SampleCase {
+  - capacity : int
+  - count : int
+  + SampleCase(capacity : int)
+  + getCapacity() : int
+  + getCount() : int
+  + getFreeSpace() : int
+  + store(amount : int) : boolean
+  + unload() : int
+}
+
+note right of SampleCase
+  建構：capacity < 1 設為 1；> 8 設為 8；count 從 0 開始。
+  store：amount > 0 且 amount <= 剩餘空間才存入並回傳 true；
+         否則整批拒絕、回傳 false、count 不變。
+  getFreeSpace = capacity - count（計算得出，不另存欄位）。
+  unload：回傳目前 count 並歸 0；空盒回傳 0。
+  不提供 setCount 等任意改存量的方法；欄位一律 private。
+  恆成立：1 <= capacity <= 8，0 <= count <= capacity。
+end note
+@enduml

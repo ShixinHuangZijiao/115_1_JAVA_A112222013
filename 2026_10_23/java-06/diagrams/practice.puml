@@ -1,0 +1,23 @@
+@startuml
+!pragma layout smetana
+skinparam classAttributeIconSize 0
+skinparam defaultFontName "Microsoft JhengHei"
+hide circle
+
+title B2 練習｜MissionStep（部分成員圖）
+
+class MissionStep {
+  - command : int
+  - energy : int
+  - result : String
+  + MissionStep(command : int, energy : int, result : String)
+  + getEnergy() : int
+  + isSuccessful() : boolean
+}
+
+note right of MissionStep
+  部分成員圖：刻意省略
+  getCommand() 與 getResult()。
+  B2 補上 getEnergy、isSuccessful。
+end note
+@enduml

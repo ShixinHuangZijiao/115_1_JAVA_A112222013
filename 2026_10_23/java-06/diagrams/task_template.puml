@@ -1,0 +1,48 @@
+@startuml
+!pragma layout smetana
+skinparam classAttributeIconSize 0
+skinparam defaultFontName "Microsoft JhengHei"
+hide circle
+
+title D3｜任務關係圖（部分成員圖）
+
+class MissionLog {
+  + {static} main(args : String[]) : void
+  ~ {static} runMission(script : int[], energy : int, samples : int) : void
+}
+
+class Mission {
+  - rover : Rover
+  - history : ArrayList<MissionStep>
+  - returned : boolean
+  + Mission(rover : Rover)
+  + run(script : int[]) : void
+  + countOk() : int
+  + lowestEnergy() : int
+}
+
+class Rover {
+  + execute(command : int) : String
+  + isStopped() : boolean
+}
+
+class MissionStep {
+  + getEnergy() : int
+  + isSuccessful() : boolean
+}
+
+Mission "1" --> "1" Rover : rover
+Mission "1" --> "0..*" MissionStep : history
+MissionLog ..> Rover : 區域變數 rover
+MissionLog ..> Mission : 區域變數 mission
+MissionLog ..> MissionStep : getStep 回傳值
+
+note bottom of Mission
+  關聯（實線）：Mission 用欄位 rover、history 保存。
+  0..* 是模型允許的數量，空腳本為 0 筆，不是預設腳本的 3。
+  相依（虛線）：MissionLog 只在 runMission／printReplay 的
+  區域變數與回傳值中使用，沒有物件欄位。
+  省略：Mission 的 getOutcome、getStepCount、getStep、
+  countCommands、countRejected；Rover、MissionStep 只列部分成員。
+end note
+@enduml
