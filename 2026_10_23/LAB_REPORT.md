@@ -207,7 +207,7 @@ IntelliJ IDEA：**待補**。沒有用 IDEA 的圖形介面實際開啟 java-06 
 
 ### E1 人工初版
 
-在打開 SampleCase 之前，先在 `diagrams/samplecase_initial.puml` 畫初版並產生 SVG，填進 DESIGN.md，再**先單獨 commit 人工初版**，之後才進 E2。設計內容與每個決定對應的需求句見 [DESIGN.md](java-06/DESIGN.md) 第 4 節。
+依需求句先在 `diagrams/samplecase_initial.puml` 畫初版並產生 SVG、填進 DESIGN.md，之後才寫 E2 的審查與 SampleCase 程式。**未依投影片建議先單獨 commit 人工初版**：第六週全部內容是在 2026-11-25 以同一個 commit「1120」（`2f22ced`）一起提交的。設計內容與每個決定對應的需求句見 [DESIGN.md](java-06/DESIGN.md) 第 4 節。
 
 先預測：容量 3，存 2 後再存 2 → 第二次失敗，存量維持 2。
 
@@ -249,10 +249,10 @@ IntelliJ IDEA：**待補**。沒有用 IDEA 的圖形介面實際開啟 java-06 
 - [x] main 預設腳本為 {1,1,2}，沒有暫時測試碼。
 - [x] 三份 `.puml` 都重新產生 `.svg`。
 - [x] `java-06/src` 共 11 檔（starter 五檔＋examples 六檔，examples 為依投影片自行重建）；README.md、DESIGN.md、diagrams 三組圖已完成；out、.class、.idea、*.iml、PlantUML jar 都不提交。
-- [ ] commit、push、遠端確認 DESIGN.md 的圖顯示正常：待推送後填寫。
-- [ ] 另一位置 clone，重編譯並跑 MissionLog 與 SampleCaseDemo：待推送後填寫。
+- [x] commit、push、遠端確認圖可顯示：第六週 commit `2f22ced`（1120）於 2026-11-27 與第七週一起 push 到 origin/main；GitHub 上 `diagrams/*.svg` 以 image/svg+xml 正常提供。圖可顯示只證明能顯示，不證明類別圖正確。
+- [x] 另一位置 clone，重編譯並跑 MissionLog 與 SampleCaseDemo：從 GitHub clone 到另一個本機暫存資料夾（原副本未刪），HEAD 為 `11f202e`；JDK 21.0.13.1；`2026_10_23/java-06/src` 有 11 檔，`javac -encoding UTF-8 -d out src/*.java` 編譯成功。MissionLog 得「最終能源=6, 樣本數=5, 行動次數=3 -> 任務成功」「電量百分比=30.0」；SampleCaseDemo 得 第一次=true, 存量=2／超量存放=false, 存量=2／剛好裝滿=true, 存量=3／卸載=3／空盒卸載=0，與預期一致。
 
-最終 commit：待推送後填寫。
+最終 commit：第六週作業 `2f22ced`；本段驗證紀錄另以後續 commit 補上。
 
 ## 選做
 

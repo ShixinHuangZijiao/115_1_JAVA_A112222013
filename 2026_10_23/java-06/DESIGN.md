@@ -36,7 +36,7 @@
 
 ![samplecase_initial](diagrams/samplecase_initial.svg)
 
-這份初版在看模擬 AI 圖之前就先畫好，並先單獨 commit。
+這份初版依需求句先畫好，之後才寫 E2 的審查與 SampleCase 程式。投影片建議先單獨 commit 初版，但實際上第六週是和其他檔案一起在同一個 commit 提交的。
 
 | 決定 | 對應的需求句 |
 |---|---|

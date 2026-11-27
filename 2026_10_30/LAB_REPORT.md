@@ -338,7 +338,9 @@ F3：課後遷移選 CargoRover，新增 private cargo、load 方法與 super �
 - [x] `heavy_practice.puml` 與 SVG 同步。
 - [x] `[AI]` 原文（`0f597ec`）與 `[fix]` 修正（`e551194`）兩個 commit 可比較。
 - [x] `java-07/src` 共 11 檔：examples 3＋starter 6＋自己的 CargoRover、CargoRoverTry；`ai-check` 有完成的 Rover、修正後 AI HeavyRover、HeavyRoverTry。out、jar、.idea、*.iml、C 段錯誤副本都不提交。
-- [ ] push 後在 GitHub 核對程式與 SVG：待推送後填寫。
-- [ ] 另一位置 clone，編譯並跑 HeavyRoverTry：待推送後填寫。
+- [x] push 後在 GitHub 核對：2026-11-27 push 到 origin/main，最新為 `11f202e`；`diagrams/heavy_practice.svg` 在 GitHub 以 image/svg+xml 正常提供。
+- [x] 另一位置 clone，編譯並跑 HeavyRoverTry：從 GitHub clone 到另一個本機暫存資料夾（原副本未刪），HEAD 為 `11f202e`；JDK 21.0.13.1；`src` 有 11 檔，src 與 ai-check 分開編譯成功。HeavyRoverTry 15/15 相符、CargoRoverTry 12/12 相符、ai-check 的 HeavyRoverTry 15/15 相符；MissionLog 得「最終能源=6, 樣本數=5, 行動次數=3 -> 任務成功」「電量百分比=30.0」。
+
+最終 commit：第七週作業 `fa0c55f`（D 段）、`0f597ec`（[AI]）、`e551194`（[fix]）、`11f202e`（遷移與報告）；本段驗證紀錄另以後續 commit 補上。
 
 IntelliJ IDEA：本週投影片寫「可示範」，非必做；本週沒有用 IDEA 操作。
