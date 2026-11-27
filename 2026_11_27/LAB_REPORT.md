@@ -413,7 +413,27 @@ DrillMissionTry 14 行全部「相符」：
 
 ### E4 最小修正
 
-**待進行**：依投影片規定，保存順序為 `[AI]` 原文 → 本人預測與反例 → `[fix]` 修正。本人要求先檢查內容再 commit，所以目前 ai-check 的 HeavyRover 仍是模擬 AI 原稿，等 `[AI]` commit 後再做最小修正：刪除子類別的 private explore()、改成覆寫正確的產量方法（同 TODO 2），不為產量重寫 execute、不改 drill、不改父類別，重跑同一個 HeavyRoverTry，再以 `[fix]` commit 保存。
+依投影片規定的保存順序：
+
+| 順序 | commit | 內容 |
+|---|---|---|
+| 1 | `9929f2b` | 本人 D 段完成碼、D5 反例與 E1 預測（不含 ai-check） |
+| 2 | `03ec6f6` `[AI]` | 放入教師模擬 AI 的 HeavyRover 原稿，與教材逐字相同 |
+| 3 | `dc45890` `[fix]` | 本人最小修正 |
+
+最小修正（只改 ai-check 的 HeavyRover，共 5 行新增、6 行刪除）：
+1. 刪除子類別的 `private String explore()`。
+2. 改成覆寫父流程會呼叫的產量方法：`@Override protected int exploreYield() { return 3; }`（同 TODO 2）。
+3. 不為產量重寫 execute、不改 drill、不改父類別 Rover；模擬原稿沒有 D6 的 execute 覆寫，ai-check 不補。
+
+重新編譯 ai-check，跑**同一個** HeavyRoverTry：15 行全部「相符」，原本不符的兩行變成：
+
+```text
+探索後: 6/6/2/1 （預期 6/6/2/1） 相符
+完成後狀態維持: 6/6/2/1 （預期 6/6/2/1） 相符
+```
+
+用 `git diff 03ec6f6 dc45890` 可以直接比較 AI 原稿與本人修正。
 
 ### E5 補強 Prompt
 
@@ -469,7 +489,7 @@ DrillMissionTry 14 行全部「相符」：
 - [x] README.md 寫 main 入口、JDK、完成度；dispatch_practice 的 puml 與 SVG 同步；缺項據實標示。
 - [ ] commit、push、GitHub 核對：本人要求先檢查，尚未 commit。
 - [ ] 原 repo 以外的新位置 clone，編譯 java-08/src、執行 CompareMissions：待推送後進行。
-- [x] ai-check 單獨編譯與重測（目前為模擬 AI 原稿，E4 修正待 `[AI]` commit 後進行）；out、.class、IDE 暫存不提交。
+- [x] ai-check 單獨編譯與重測：`[AI]` 原稿 2 行不符，`[fix]` 修正後 15 行相符；out、.class、IDE 暫存（.idea、*.iml）不提交。
 
 ### IntelliJ IDEA（本人操作，2026-11-27）
 

@@ -12,7 +12,7 @@
 | src | Member、VipMember、MemberDemo | 會員覆寫範例 | MemberDemo 有 |
 | experiments | BoundaryTry | 本人 D5 邊界測試與反例 | 有 |
 | transfer | SurveyRover、SurveyRoverTry | 本人課後遷移（路線 A） | SurveyRoverTry 有 |
-| ai-check | Rover、HeavyRoverTry、HeavyRover | E 段模擬 AI 審查（HeavyRover 為教師模擬 AI 原稿） | HeavyRoverTry 有 |
+| ai-check | Rover、HeavyRoverTry、HeavyRover | E 段模擬 AI 審查（HeavyRover 為本人最小修正後版本；原稿見 `[AI]` commit） | HeavyRoverTry 有 |
 
 `src` 依投影片規定只放 examples 三檔＋starter 八檔共 11 檔。ai-check 和 src 都有 HeavyRover，**必須分開編譯**。
 
@@ -62,4 +62,4 @@ java -cp out-ai HeavyRoverTry
 
 - 完成：TODO 1–4；五個入口；D5 邊界與本人反例；B2、B3、C2 實驗；E1 預測、E2 不符證據、E3 @Override 與 static 判讀；F1 類別圖；SurveyRover 遷移與測試。
 - 完成（本人操作）：用 IntelliJ IDEA 2026.3.0.1 開啟 java-08，src 為來源根（ai-check 不可標成 Sources，否則和 src 的 HeavyRover 撞名），從 MemberDemo 執行。
-- 待完成：E4 最小修正（依規定須先以 `[AI]` commit 保存模擬原稿後再修正、以 `[fix]` commit 保存）。
+- 完成：E4 最小修正。依規定先以 `[AI]` commit（03ec6f6）保存模擬原稿，再以 `[fix]` commit（dc45890）保存修正；ai-check 的 HeavyRover 現為修正後版本，HeavyRoverTry 15 行相符。
