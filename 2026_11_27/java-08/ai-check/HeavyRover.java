@@ -13,12 +13,11 @@ public class HeavyRover extends Rover {
 
     public int getDrillCount() { return drillCount; }
 
-    // 模擬AI提出的探索方法，請核對是否符合父類別契約。
-    private String explore() {
-        if (!spendEnergy(6)) { return "能源不足"; }
-        addSamples(3);
-        countAction();
-        return "成功";
+    // [fix] 本人最小修正：刪除模擬AI的 private explore()（父類別 private 方法不被繼承、不能覆寫，
+    //       Rover.execute 從不呼叫它），改成覆寫父流程會呼叫的產量方法；不改 execute、drill 與父類別。
+    @Override
+    protected int exploreYield() {
+        return 3;
     }
 
     // 其餘部分保留模擬原稿，供後續最小修正比較。
