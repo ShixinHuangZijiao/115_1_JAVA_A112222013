@@ -7,7 +7,7 @@
 | 建議與本人處理 | Mission.run：每輪先檢查 isStopped、execute 後用行動後能源建立 MissionStep、指令 0 記錄後才停；countOk 用 isSuccessful；lowestEnergy 空清單回 -1、非空以首筆為起點。採納，因為符合投影片 D2 的順序表與六條路線。樣本盒採用 private 欄位、`store : boolean`、剩餘空間計算得出、提供 unload；E2 模擬 AI 圖的 6 項問題全部拒絕（store 回 void、直接累加、欄位 public、缺 unload、缺剩餘空間查詢、無容量修正） |
 | 本人實際驗證 | 全部在本機以 JDK 21.0.13 實際執行：六條路線與五筆固定狀態和投影片表格一致；RoverDemo、RelationDemo、SampleCaseDemo 輸出與投影片答案逐行一致。E3 錯誤副本（刪超量檢查）得 超量存放=true, 存量=4，恢復後 超量存放=false, 存量=2，再重測 {1,1,2}、{3,9,0} 通過。D3 反例（刪停止檢查）在 {1,1,1,1} 多出一筆「任務已停止」。圖用 PlantUML 1.2026.10 產生並以 PNG 預覽檢查。細節見 LAB_REPORT D3、E3 |
 
-AI 的正確宣稱不能代替編譯執行。examples 六檔是依投影片規格自行重建，不是老師原檔。IntelliJ IDEA 圖形介面操作沒有實際做，在 LAB_REPORT 標示待補。
+AI 的正確宣稱不能代替編譯執行。examples 六檔是依投影片規格自行重建，不是老師原檔。IntelliJ IDEA 圖形介面操作由本人於 2026-11-27 親自補做（AI 只提供操作步驟說明），執行截圖與輸出見 LAB_REPORT D1。
 
 ## 我的反思
 

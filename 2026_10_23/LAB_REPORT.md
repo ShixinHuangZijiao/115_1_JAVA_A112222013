@@ -89,7 +89,29 @@ A、B 的欄位指向同一顆 8 格電池：A 用 6 剩 2，B 要 6 被拒絕�
 
 四類別責任表寫在 [java-06/DESIGN.md](java-06/DESIGN.md) 第 1 節。
 
-IntelliJ IDEA：**待補**。沒有用 IDEA 的圖形介面實際開啟 java-06 並從 MissionLog 執行；以上都是終端機結果，依投影片規定不能當成 IDE GUI 成功。
+IntelliJ IDEA：本人於 2026-11-27 補做（IntelliJ IDEA 2026.3.0.1，Project SDK 為 JDK 21.0.13）。
+
+1. File → Open 開啟 `2026_10_23/java-06`（不是整個 repo），選 Trust Project；沒有建立新 repo，也沒有選 Maven／Gradle。
+2. File → Project Structure：Project SDK 為 JDK 21、Language level 為 SDK default；Modules 中 `src` 已是 Sources Root（Source Folders 列出 src）。
+3. 專案樹 `src` 內有 11 個類別；開啟 `MissionLog.java`，點 main 左邊的綠色 ▶ 選 Run 'MissionLog.main()'。MissionStep、Mission、Rover 沒有 main，不是入口。
+
+Run 視窗輸出與 D3 終端機結果一致：
+
+```text
+=== 任務回放 ===
+步驟 1: 指令=1, 結果=成功, 能源=14
+步驟 2: 指令=1, 結果=成功, 能源=8
+步驟 3: 指令=2, 結果=成功, 能源=6
+指令次數[0..3]=[0, 2, 1, 0]
+步數=3, 成功=3, 拒絕=0, 略過=0
+最低能源=6
+最終能源=6, 樣本數=5, 行動次數=3 -> 任務成功
+電量百分比=30.0
+```
+
+IDEA 自動產生的 `.idea/` 與 `java-06.iml` 已由 `.gitignore` 排除，沒有提交。
+
+![IntelliJ IDEA 從 MissionLog 執行](images/idea_missionlog.png)
 
 ### D2 Mission TODO 1–3
 

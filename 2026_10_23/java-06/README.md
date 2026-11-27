@@ -56,4 +56,5 @@ java -jar C:\Users\qkall\ClassTools\plantuml.jar -charset UTF-8 -tsvg diagrams\*
 ## 完成／未完成
 
 - 完成：Mission TODO 1–3；六條路線；D3 停止檢查反例；三份 puml 與 SVG；DESIGN.md 責任表與關係證據；SampleCase 人工初版、E2 審查、E3 超量反例、E4 Prompt。
-- 未完成：IntelliJ IDEA 圖形介面操作（待補）；選做的社團器材借用圖。
+- 完成（2026-11-27 補做）：用 IntelliJ IDEA 2026.3.0.1 開啟 java-06 並從 MissionLog 執行。
+- 未完成：選做的社團器材借用圖。
