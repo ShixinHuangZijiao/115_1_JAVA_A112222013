@@ -1,180 +1,96 @@
-# 第五週實作報告：把任務日誌設計成物件
+# 第四週學生實作：火星探測車任務日誌
 
 姓名：曹臣緯　學號：A112222013　實際上課日期：2026/10/16　實際 JDK：openjdk 21.0.13.1（javac 21.0.13.1，Microsoft Build）
 
-**教材版本說明**：學期 repo 內的課程資料（`115_1_Java_student-main/`）是舊版。本週改用老師最新發布的教材：結果代碼與報表都改成繁體中文，投影片也換成 `week05_slides_codex_claude.html`。本週教材沒有 student_lab.md 與 assignment.md，所以本報告依投影片的講義題號 A–H 整理。
+> **日期更正（2026-11-27）**：本週資料夾原本命名為 `2026_10_09`，是 AI 依「每週五上課、往後推一週」推算的，沒有考慮 10/09、10/23 放假與實際進度。依本人確認的課表，第四週實際上課日期為 `2026_10_16`，資料夾已用 `git mv` 改名（保留 commit 歷史），報告內的日期與路徑一併更正。
 
-所有「實際」欄位都是本機實際執行的輸出。錯誤實驗都放在 repo 外的暫存副本，`java-05/src` 只保留正確版。執行時加上 `-Dstdout.encoding=UTF-8`，避免 Windows 主控台把中文印成亂碼。
+**教材版本說明**：本週最初依學期 repo 內的舊版教材完成（英文輸出）。之後發現老師發布的新版教材把結果代碼與報表都改成繁體中文（程式邏輯、TODO 與題目不變），所以改用新版 starter 與 examples 重新完成，並重跑所有測試；以下所有輸出都是新版中文版本的實際結果。
 
-## A｜取回與診斷
+所有「實際」欄位都是本機實際執行的輸出。錯誤實驗都使用 repo 外的暫存副本，`java-04/src` 內的繳交版沒有被改動。課程教材的 week04 沒有 assignment.md，需求以講義與投影片為準。執行時加上 `-Dstdout.encoding=UTF-8`，避免 Windows 主控台把中文印成亂碼。
 
-1. 使用既有 repo `115_1_JAVA_A112222013`，確認與 origin/main 同步。建立 `2026_10_16/java-05/src`，放入 examples 六檔與 starter 兩檔，共 8 個 Java 檔；teacher 同名檔不放。
-2. `java -version`：openjdk version "21.0.13.1" 2026-11-17 LTS；`javac -version`：javac 21.0.13.1。
-3. 在 java-05 執行 `javac -encoding UTF-8 -d out src/*.java` 編譯成功。
+## A｜取回與先備診斷
 
-診斷：第四週假設第 2 步漏掉 `energyLog.add(8)`，energyLog 會變成 [14, 6]。用同一索引回放時，第 2 步會配到第 3 步的能源 6；第 3 步讀 energyLog.get(2) 會拋出 IndexOutOfBoundsException。三條清單沒有任何機制保證同一索引屬於同一步，所以本週改成「一步 = 一個 MissionStep 物件」。
+1. 使用既有 repo `115_1_JAVA_A112222013`，確認與 origin/main 同步。在 repo 根目錄建立 `2026_10_16/java-04/src`（repo 根目錄相當於講義的 115_1_Java）。
+2. 放入五個核心 examples（ArrayBasics、CommandCounter、ArrayReference、ListBasics、CollectionsDemo）與 starter/MissionLog.java；本報告與 AI_USAGE 放在日期資料夾下。
+3. `java -version`：openjdk version "21.0.13.1" 2026-11-17 LTS；`javac -version`：javac 21.0.13.1。
+4. 在 java-04 執行 `javac -encoding UTF-8 -d out src/*.java` 編譯成功，再執行 `java -cp out MissionLog`。
 
-## B｜類別與建構（CreateStepDemo + StepCard）
+診斷：第三週 {1,1,2} 的最終能源/樣本/成功行動次數：6/5/3。{2,1,1} 是否相同：相同（20→18→12→6，樣本 1→3→5，也是 3 次），也是 6/5/3。只有最終三個數字，能否分辨路線：不能，兩條路線的終點完全一樣，必須保存每一步才能回放。
 
-### B1 一行程式，三個角色
+## B｜固定資料：陣列與計數
 
-`StepCard first = new StepCard(1, 14);`
-
-- `StepCard`：類別，規定物件有哪些欄位與方法，也是變數 first 的型態。
-- `new StepCard(1, 14)`：真正建立一個物件，並呼叫建構子把 1、14 存進欄位。
-- `first`：參考變數，保存「找得到那個物件」的參考值，不是把整個物件裝進去。只寫 `StepCard first;` 只有變數、沒有物件。
-
-`this.energy = energy;`：左邊是目前物件的欄位，右邊是這次呼叫傳進來的參數。若寫成 `energy = energy;`，只是參數指定給自己，欄位仍是預設值 0。
-
-### B2 兩次 new
-
-| 時間點 | first 的 command／energy | second 的 command／energy |
+| 項目 | 預測 | 本人實際結果 |
 |---|---|---|
-| 第一個 new 完成 | 1／14 | 尚未建立 |
-| 第二個 new 完成 | 1／14（不被覆蓋） | 2／12 |
+| script.length | 3 | 長度=3 |
+| new int[4] 內容 | [0, 0, 0, 0] | 指令次數=[0, 0, 0, 0] |
+| new String[2] 內容 | [null, null] | 標籤=[null, null] |
+| 逐步指令輸出 | 步驟 1: 1／步驟 2: 1／步驟 3: 2 | 步驟 1: 1、步驟 2: 1、步驟 3: 2 |
+| 指令數值加總（不是行動數） | 4 | 加總=4 |
 
-預測三行輸出：第一次=1/14、第二次=2/12、同一個物件=false。實際：
+1. length 是欄位，不加括號；陣列合法索引範圍是：0 ≤ i < length，也就是 0 到 length-1（本例 0–2）。
+2. 在副本取消越界行註解：編譯成功，執行時發生 `ArrayIndexOutOfBoundsException: Index 3 out of bounds for length 3`，是執行時錯誤，不是編譯錯誤。副本已丟棄，繳交版未改。
+3. CommandCounter 腳本 {3,9,0,1,1,-1}，預測 counts：[1, 2, 0, 1]；實際：指令次數=[1, 2, 0, 1]。9 和 -1 為何不得當索引：counts 只有索引 0–3，用 9 或 -1 當索引會越界丟例外，所以要先檢查範圍。
+4. 改為 {0,2,2,3}，預測：[1, 0, 2, 1]；實際：指令次數=[1, 0, 2, 1]；副本已丟棄，原示範未改。
+5. 在 `for (int command : script)` 內寫 command=0，是否改掉 script 的元素：不會，command 只是每個元素值的複製。用副本檢查：迴圈後印出 script 仍是 [1, 1, 2]。
 
-```text
-第一次=1/14
-第二次=2/12
-同一個物件=false
-```
+## C｜參考與方法
 
-一致。兩次 new 就是兩個物件，各有自己的欄位。
-
-### B3 編譯錯誤（兩個都在副本試過，正式 src 未改）
-
-| 取消註解的行 | 實際編譯訊息 | 原因 |
+| 時間點 | 預測 energy 內容 | 本人實際 |
 |---|---|---|
-| `first.energy = 99;` | `error: energy has private access in StepCard` | energy 是 private，只有 StepCard 自己能直接存取 |
-| `StepCard empty = new StepCard();` | `error: constructor StepCard in class StepCard cannot be applied to given types; required: int,int found: no arguments` | 已經自己宣告了兩參數建構子，編譯器就不再自動補無參數版 |
+| alias[0]=19 後 | [19, 14, 8] | 透過別名修改後=[19, 14, 8] |
+| changeFirst 後 | [18, 14, 8] | 修改元素後=[18, 14, 8] |
+| replaceLocal 內的新陣列 | [20, 20, 20] | 方法內重新指定後=[20, 20, 20] |
+| 回到 main 後 | [18, 14, 8] | 返回呼叫端後=[18, 14, 8] |
+| == 與 Arrays.equals 的兩個結果 | false／true | 參考相同=false、內容相同=true |
 
-### static 與實例成員
+Java 傳值；陣列參數取得的是：參考值的副本（指向同一個陣列）。為何修改元素看得見，重新指定參數卻不改呼叫端：改元素是透過同一個參考修改同一個陣列，呼叫端看得到；重新指定只是讓方法內的區域變數指向新陣列，呼叫端的變數仍指向原陣列。
 
-`main` 是 static，屬於類別，不必先 new 就能由 JVM 執行；command、energy 是實例欄位，每個物件各有一份。若欄位誤加 static，所有物件共用同一格，後建立的會覆蓋前面的值（F3 選項 1 已實測：first 也變成 2/12）。
+## D｜筆數會增加：ArrayList
 
-## C｜封裝（BatteryDemo + RoverBattery）
-
-| 呼叫順序 | 預測回傳值／能源 | 實際 |
+| 項目 | 預測 | 本人實際 |
 |---|---|---|
-| low 從 5 開始，explore() | false／5 | 探索=false, 能源=5 |
-| low.charge() | true／10 | 充電=true, 能源=10 |
-| low.explore() | true／4 | 探索=true, 能源=4 |
-| edge 從 19 開始，charge() | true／20（封頂） | 充至上限=true, 能源=20 |
-| edge 再 charge() | false／20 | 已充滿=false, 能源=20 |
+| 原清單/size/first | [1, 1, 2]／3／1 | 指令清單=[1, 1, 2], 筆數=3、第一筆=1 |
+| set(1,3) 後 | [1, 3, 2] | 修改後=[1, 3, 2] |
+| remove(0) 後 | [3, 2] | 依索引刪除後=[3, 2] |
+| remove(Integer.valueOf(3)) 後 | [2] | 依值刪除後=[2] |
+| isEmpty() | false | 清單為空=false |
 
-全部一致。energy 是 private，外部只能透過 explore()、charge() 修改，扣電和封頂的規則只寫在一個地方。如果開放 `setEnergy(999)`，每個呼叫端都要自己負責檢查範圍，規則就散掉了。private 只限制存取位置，不會自動檢查數值範圍。
+ArrayList<int> 為何不能編譯：泛型的型態參數必須是參考型態，int 是基本型態，要用 Integer。在副本取消註解後實際編譯訊息為 `error: unexpected type ... required: reference`；副本已丟棄，繳交版可正常編譯。
 
-「目前狀態」和「歷史紀錄」需求不同：RoverBattery 代表現在的能源，可以透過守規則的方法改變；StepCard／MissionStep 代表某一步發生了什麼，建立後只讀，所以不提供 setter。
+## E｜新增、回放、計數
 
-### C1 C# 與 Java 欄位存取差異
+已依 2→3→1 完成 TODO 2（每步 add 三欄）、TODO 3（同索引回放，格式 `步驟 1: 指令=1, 結果=成功, 能源=14`）、TODO 1（範圍檢查後計數），F1 再完成 TODO 4、5。
 
-| 類別裡的欄位 | C# | Java |
-|---|---|---|
-| 明寫 private | 只有類別內可用 | 只有類別內可用 |
-| 省略修飾字 | 預設 private | 套件存取：同一套件都能讀寫 |
-| 外部讀、內部改 | `public int Energy { get; private set; }` | private 欄位 + getEnergy() + 受控方法 |
+{3,9,0} 的逐步追蹤：
 
-本人在副本驗證：保留 private 時 `first.energy = 99;` 編譯失敗（見 B3）；把 StepCard 的 `private int energy;` 改成 `int energy;` 後編譯成功，執行印出「改寫後=99」。因為 StepCard 與 CreateStepDemo 都在預設套件，省略 private 就打開了保護缺口。副本已丟棄。
-
-## D｜參考與快照
-
-### D1 ReferenceDemo
-
-| 呼叫後 | 預測 | 實際 |
-|---|---|---|
-| alias.explore() 後 first/other | 14/20 | 建立別名後=14/20 |
-| first == alias | true | 同一個參考=true |
-| spend(first) 後 | 8 | 扣除能源後=8 |
-| replaceLocal 內部 | 1 | 方法內新物件的能源=1 |
-| replaceLocal 返回後 | 8 | 重新指定參考後=8 |
-
-`alias = first` 複製的是參考值，first 和 alias 指向同一顆電池；other 是另一次 new 的電池。Java 一律傳值，物件參數拿到的是參考值的副本：透過副本修改物件，呼叫端看得到；把副本改指新物件，呼叫端不受影響。
-
-### D2 IntelliJ IDEA
-
-本人於 2026-11-27 補做（IntelliJ IDEA 2026.3.0.1，Project SDK 為 JDK 21.0.13）：
-
-1. 從 IDEA 歡迎畫面按 Open，開啟 `2026_10_16/java-05`（不是整個 repo），選 Trust Project。
-2. File → Project Structure → Project：SDK 為「21 java version "21.0.13"」，Language level 為 SDK default，Compiler output 為 `java-05\out`。
-3. Modules：java-05 模組已存在，`src` 為藍色、列在 Source Folders，IDEA 自動標好 Sources Root，不需修改。
-4. 開啟 `src/SnapshotDemo.java`，點 main 左邊的綠色 ▶ 選 Run 'SnapshotDemo.main()'。
-
-Run 視窗輸出：
-
-```text
-指令=1, 能源=14
-指令=3, 能源=19
-目前能源=19
-各自獨立的紀錄=true
-
-Process finished with exit code 0
-```
-
-與 D3 的終端機結果一致。IDEA 自動產生的 `.idea/` 與 `java-05.iml` 已由 `.gitignore` 排除，沒有提交。
-
-![IntelliJ IDEA 執行 SnapshotDemo](images/idea_snapshotdemo.png)
-
-### D3 SnapshotDemo
-
-預測：指令=1/能源=14、指令=3/能源=19、目前能源=19、各自獨立的紀錄=true。實際：
-
-```text
-指令=1, 能源=14
-指令=3, 能源=19
-目前能源=19
-各自獨立的紀錄=true
-```
-
-一致。每次 `new StepCard(..., battery.getEnergy())` 都複製了當下的 int 值，之後充電不會把第一筆的 14 改成 19。
-
-想一想：如果兩次 add 的是同一顆電池，清單不會自動複製。add 只存參考，兩個索引會指向同一個物件（F3 選項 3 已實測：19/19、同一個物件=true）。
-
-## E｜作業實作
-
-### E1 MissionStep TODO 1–3 與兩物件檢查
-
-- TODO 1：建構子用 `this.command = command;` 等三行保存參數。
-- TODO 2：三個 getter 回傳本物件的欄位。
-- TODO 3：`return "成功".equals(result);`，用內容比較，result 為 null 時也不會丟例外。
-
-暫時把檢查碼放在副本的 MissionLog.main 最前面（正式 src 沒有放）：
-
-```java
-MissionStep first = new MissionStep(1, 14, new String("成功"));
-MissionStep second = new MissionStep(2, 12, "能源不足");
-```
-
-| 物件 | 預期 command／energy／result／isSuccessful | 實際 |
-|---|---|---|
-| first | 1／14／成功／true | 1/14/成功/true |
-| second | 2／12／能源不足／false | 2/12/能源不足/false |
-
-建立 second 後 first 沒有被覆蓋；`new String("成功")` 內容相同、參考不同，仍判為 true。
-
-### E2 MissionLog TODO 4–6
-
-- TODO 4：switch 之後 `history.add(new MissionStep(command, energy, result));`。放在行動完成之後，result 才有值、energy 才是行動後的能源；成功、拒絕、無效、返回每一筆都記。
-- TODO 5：一般 for 迴圈 `history.get(i)` 取出物件，再用三個 getter 印出「步驟 i+1: 指令=…, 結果=…, 能源=…」。
-- TODO 6：加強版 for 走訪 history，`isSuccessful()` 為 true 時 ok++，`"返回".equals(step.getResult())` 時 returned++。
-
-最低能源是老師提供的支援碼：清單裝的是 MissionStep 不是 Integer，沒有定義「誰比較小」，所以不能用 Collections.min；起點用第一筆的能源，用 0 會把 14、8、6 錯算成 0。
-
-### E3 六條路線驗收
-
-| script | 預期 能源/樣本/行動、結果、步數/成功/拒絕/略過、次數、最低 | 本人實際 | 相符 |
+| 步 | 指令 | 預測結果/執行後能源 | 本人實際結果/能源 |
 |---|---|---|---|
-| {1,1,2} | 6/5/3 任務成功、3/3/0/0、[0,2,1,0]、6 | 6/5/3 任務成功、3/3/0/0、[0, 2, 1, 0]、6 | 是 |
-| {3,9,0} | 20/0/0 已返回、3/0/2/0、[1,0,0,1]、20 | 20/0/0 已返回、3/0/2/0、[1, 0, 0, 1]、20 | 是 |
-| {0} | 20/0/0 已返回、1/0/0/0、[1,0,0,0]、20 | 20/0/0 已返回、1/0/0/0、[1, 0, 0, 0]、20 | 是 |
-| {2,2,2,2,2} | 10/5/5 任務成功、5/5/0/0、[0,0,5,0]、10 | 10/5/5 任務成功、5/5/0/0、[0, 0, 5, 0]、10 | 是 |
-| {1,1,1,1} | 2/6/3 任務成功、3/3/0/1、[0,3,0,0]、2 | 2/6/3 任務成功、3/3/0/1、[0, 3, 0, 0]、2 | 是 |
-| {2,1} | 12/3/2 任務未完成、2/2/0/0、[0,1,1,0]、12 | 12/3/2 任務未完成、2/2/0/0、[0, 1, 1, 0]、12 | 是 |
+| 1 | 3 | 能源已滿／20 | 能源已滿／20 |
+| 2 | 9 | 無效指令／20 | 無效指令／20 |
+| 3 | 0 | 返回／20 | 返回／20 |
+
+此時 commandLog/energyLog/resultLog 各有幾筆：各 3 筆。actionCount 是幾次：0 次。差異原因：日誌記錄每一筆讀到的指令（含拒絕、無效、返回），actionCount 只計算成功的行動。
+
+| script | 預期狀態/結果 | 本人實際狀態/結果 | counts、摘要、每筆回放均相符？ |
+|---|---|---|---|
+| {0} | 20/0/0 已返回 | 20/0/0 已返回 | 是 |
+| {1,1,2} | 6/5/3 任務成功 | 6/5/3 任務成功 | 是 |
+| {2,2,2,2,2} | 10/5/5 任務成功 | 10/5/5 任務成功 | 是 |
+| {3,9,0} | 20/0/0 已返回 | 20/0/0 已返回 | 是 |
+| {1,1,1,1} | 2/6/3 任務成功 | 2/6/3 任務成功 | 是（略過=1，第四筆未讀） |
+| {2,1} | 12/3/2 任務未完成 | 12/3/2 任務未完成 | 是 |
 
 完整輸出（每列在副本修改 main 的 script 後重新編譯；繳交版維持 {1,1,2}）：
 
 ```text
+######## script={0}
+=== 任務回放 ===
+步驟 1: 指令=0, 結果=返回, 能源=20
+指令次數[0..3]=[1, 0, 0, 0]
+步數=1, 成功=0, 拒絕=0, 略過=0
+最低能源=20
+最終能源=20, 樣本數=0, 行動次數=0 -> 已返回
+電量百分比=100.0
 ######## script={1, 1, 2}
 === 任務回放 ===
 步驟 1: 指令=1, 結果=成功, 能源=14
@@ -185,24 +101,6 @@ MissionStep second = new MissionStep(2, 12, "能源不足");
 最低能源=6
 最終能源=6, 樣本數=5, 行動次數=3 -> 任務成功
 電量百分比=30.0
-######## script={3, 9, 0}
-=== 任務回放 ===
-步驟 1: 指令=3, 結果=能源已滿, 能源=20
-步驟 2: 指令=9, 結果=無效指令, 能源=20
-步驟 3: 指令=0, 結果=返回, 能源=20
-指令次數[0..3]=[1, 0, 0, 1]
-步數=3, 成功=0, 拒絕=2, 略過=0
-最低能源=20
-最終能源=20, 樣本數=0, 行動次數=0 -> 已返回
-電量百分比=100.0
-######## script={0}
-=== 任務回放 ===
-步驟 1: 指令=0, 結果=返回, 能源=20
-指令次數[0..3]=[1, 0, 0, 0]
-步數=1, 成功=0, 拒絕=0, 略過=0
-最低能源=20
-最終能源=20, 樣本數=0, 行動次數=0 -> 已返回
-電量百分比=100.0
 ######## script={2, 2, 2, 2, 2}
 === 任務回放 ===
 步驟 1: 指令=2, 結果=成功, 能源=18
@@ -215,6 +113,16 @@ MissionStep second = new MissionStep(2, 12, "能源不足");
 最低能源=10
 最終能源=10, 樣本數=5, 行動次數=5 -> 任務成功
 電量百分比=50.0
+######## script={3, 9, 0}
+=== 任務回放 ===
+步驟 1: 指令=3, 結果=能源已滿, 能源=20
+步驟 2: 指令=9, 結果=無效指令, 能源=20
+步驟 3: 指令=0, 結果=返回, 能源=20
+指令次數[0..3]=[1, 0, 0, 1]
+步數=3, 成功=0, 拒絕=2, 略過=0
+最低能源=20
+最終能源=20, 樣本數=0, 行動次數=0 -> 已返回
+電量百分比=100.0
 ######## script={1, 1, 1, 1}
 === 任務回放 ===
 步驟 1: 指令=1, 結果=成功, 能源=14
@@ -236,95 +144,74 @@ MissionStep second = new MissionStep(2, 12, "能源不足");
 電量百分比=60.0
 ```
 
-### 教師固定狀態示範
+## F｜摘要、需求與反例
 
-我沒有看到老師現場示範，以下全部是**本人複驗**：在副本把 runMission 的初始值與 script 改成表列數值後執行。
+### F1 Collections 與 TODO 4–5
 
-| 初始能源/樣本；script | 預期 | 本人複驗結果 |
+CollectionsDemo 預測 min/max/frequency：6／20／1；實際：最小值=6、最大值=20、數值 8 的出現次數=1。排序後 original：原清單=[14, 8, 20, 6]；sorted：排序後=[6, 8, 14, 20]。為何不能只排序 energyLog 來做回放：三條清單靠同一索引對應同一步，只排序 energyLog 會讓能源和指令、結果錯配，也失去時間順序。
+
+TODO 4、5 已完成：用 `Collections.frequency(resultLog, "成功")`、`Collections.frequency(resultLog, "返回")` 計數，摘要印 `步數, 成功, 拒絕, 略過`；energyLog 為空時印 `最低能源=無紀錄`，否則用 Collections.min。
+
+教師固定狀態示範（我沒有看到教師現場示範，以下全部是**本人複驗**：在副本把 runMission 的初始值與 script 改成表列數值後執行）：
+
+| 初始 energy/samples；script | 預測結果/日誌筆數/最低能源 | 教師實際示範觀察 |
 |---|---|---|
-| 5/0；{1,3,0} | 10/0/1 已返回，3 筆，最低 5 | 10/0/1 已返回，3 筆（能源不足、成功、返回），最低能源=5 |
-| 2/4；{2} | 0/5/1 任務成功，1 筆 | 0/5/1 任務成功，1 筆，最低能源=0 |
-| 0/0；{3,1} | 能源耗盡，0 筆 | 0/0/0 能源耗盡，0 筆，略過=2，最低能源=無紀錄 |
-| 20/5；{1} | 任務成功，0 筆 | 20/5/0 任務成功，0 筆，略過=1，最低能源=無紀錄 |
-| 20/0；{} | 任務未完成，最低無紀錄 | 20/0/0 任務未完成，0 筆，最低能源=無紀錄 |
+| 5/0；{1,3,0} | 10/0/1 已返回／3 筆／5 | 本人複驗：10/0/1 已返回，3 筆（能源不足、成功、返回），最低能源=5 |
+| 2/4；{2} | 0/5/1 任務成功／1 筆／0 | 本人複驗：0/5/1 任務成功，1 筆，最低能源=0 |
+| 0/0；{3,1} | 能源耗盡／0 筆／無紀錄 | 本人複驗：0/0/0 能源耗盡，0 筆，略過=2，最低能源=無紀錄 |
+| 20/5；{1} | 任務成功／0 筆／無紀錄 | 本人複驗：20/5/0 任務成功，0 筆，略過=1，最低能源=無紀錄 |
+| 20/0；{} | 任務未完成／0 筆／無紀錄 | 本人複驗：20/0/0 任務未完成，0 筆，最低能源=無紀錄 |
 
-## F｜新需求與反例
+### F2 Prompt 設計
 
-### F1 設計卡：樣本運送盒（紙上設計，未實作）
-
-| 設計卡欄位 | 本人的決定 |
+| 要交代的需求 | 本人的內容 |
 |---|---|
-| 類別名稱與一句責任 | SampleCase：管理一個運送盒目前裝了幾份樣本，並依容量規則存入與卸空。不管探索、能源或任務流程 |
-| 欄位、型態、可見性 | `private int capacity`（建立後不變）、`private int count`（目前存量）。剩餘空間可由 capacity − count 算出，不另存欄位 |
-| 建構子 | `public SampleCase(int capacity)`：小於 1 設為 1，大於 8 設為 8；count 初始為 0 |
-| 公開方法 | `boolean store(int amount)`：amount > 0 且 amount ≤ 剩餘空間才加入並回傳 true，否則整批拒絕、回傳 false、存量不變。`int getCount()`、`int getCapacity()`、`int getRemaining()`：查詢。`int unload()`：回傳目前存量並把 count 歸 0，空盒回傳 0 |
-| 不提供的方法、恆成立條件 | 不提供 setCount 或任何直接改存量的方法，也不負責印字。恆成立：1 ≤ capacity ≤ 8、0 ≤ count ≤ capacity |
-| 測試呼叫（容量 3） | store(2)→true，存量 2、剩 1；store(2)→false，存量仍 2；store(1)→true，存量 3（剛好滿）；unload()→回傳 3，存量 0；再 unload()→回傳 0 |
+| 欄位與型態 | 每一步三個欄位：指令 int、行動執行後的能源 int、結果 String（成功／能源不足／能源已滿／無效指令／返回） |
+| 筆數是否事先固定 | 不固定；每讀一筆指令就新增一筆，任務可能提早結束。目前用固定腳本有上限，未來可能改成互動輸入 |
+| 是否保留順序 | 必須保留，回放要依執行順序 |
+| 是否容許重複 | 必須容許，同一指令可重複執行（例如連續探索） |
+| 新增、回放、計數與最低值等操作 | 每步新增三欄；依索引回放；統計 0–3 指令次數（無效指令不計）；計算成功、返回、拒絕、略過；求每步結束後的最低能源，空日誌顯示「無紀錄」 |
+| 允許的技術與驗證案例 | 只用陣列、ArrayList、Collections（min、frequency）、一般 for 與加強版 for；不自訂類別、不用 Stream。驗證：{3,9,0} 應得 3 筆、指令次數=[1,0,0,1]、拒絕=2；空腳本應得「最低能源=無紀錄」；{1,1,2} 應得 6/5/3 任務成功 |
 
-其他測試：`new SampleCase(0)` 容量應為 1；`new SampleCase(9)` 容量應為 8；`store(0)`、`store(-1)` 應回傳 false 且存量不變；兩個盒子各自存入互不影響。以上是紙上推論，**未實測**（SampleCase 實作是選做，本週沒有寫）。
+完整 Prompt：「我在寫 Java 的火星探測車任務日誌。每執行一步要保存三個欄位：指令（int）、行動後能源（int）、結果字串（成功、能源不足、能源已滿、無效指令、返回）；拒絕、無效指令和返回也要記錄。筆數事先不固定，任務可能提早結束，日誌必須保留執行順序，也要允許重複指令。需要的操作是：逐筆新增、依索引回放每一步、統計 0–3 四種指令的次數（9、-1 等無效指令不計）、用 Collections.frequency 算「成功」與「返回」筆數、用 Collections.min 找最低能源，空日誌要顯示「無紀錄」。請只用陣列、ArrayList、Collections 和一般 for，不要自訂類別或用 Stream。請說明你選擇的資料結構為什麼符合這些需求，並給一個邊界反例，例如 {3,9,0} 或空腳本，我會自己編譯驗證。」
 
-### F2 審查模擬 AI 建議
+判讀**模擬建議**：
 
-| 偏差 | 違反哪句需求 | 哪個呼叫看得出來 |
-|---|---|---|
-| 存入時沒檢查剩餘空間 | 剩餘空間不夠要整批拒絕、存量不變 | 容量 3，`store(2); store(2);` → count 變 4，超過容量 |
-| 沒拒絕非正數 | 每次存入份數要大於 0 | `store(-1)` → count 變 -1，存量反而減少 |
-| 建構子沒修正容量 | 容量範圍 1～8，超出改為最接近的合法值 | `new SampleCase(0)` 容量是 0；`new SampleCase(20)` 容量是 20 |
-| 欄位是 public | 不能任意改寫存量 | `box.count = 99;` 可以直接改，也能 `box.capacity = -5;` |
-| store 回傳 void | 呼叫者要知道是否存入成功 | `boolean ok = box.store(1);` 無法編譯 |
-| 缺少卸空與剩餘空間查詢 | 要能查剩餘空間、返航時一次卸空並取得份數 | 沒有 `unload()`、`getRemaining()` 可呼叫 |
+| 建議 | 採納/拒絕/補充條件與理由 |
+|---|---|
+| 歷程最多用 int[100] 保存就好 | 補充條件後才可用：陣列能保存有限歷程，但要另外記有效筆數 used，不能把預設值 0 當成「返回」；還要規定滿 100 筆時怎麼處理（拒絕新增或擴充）。固定腳本可以用等長陣列，但日誌未來可能改成互動輸入、筆數不定，ArrayList 的 size() 自動管理筆數比較適合，所以本作業不採用。 |
+| ArrayList 保存日誌，HashSet 保存指令，避免重複 | 拒絕 HashSet 的部分：任務可以重複探索，回放需要每一步的順序與重複；HashSet 會去掉重複、也不保證順序，只能回答「出現過哪些指令」，不能回放路線。日誌維持用 ArrayList。 |
 
-改寫後的 Prompt：
+### F3 模擬 AI 除錯二選一
 
-> 請設計 SampleCase，責任是管理一個樣本運送盒目前的存量，並依容量規則存入與卸空。
-> 建構規則：`SampleCase(int capacity)`，容量小於 1 時設為 1、大於 8 時設為 8；初始存量 0。
-> 公開方法：`boolean store(int amount)`，amount 大於 0 且不超過剩餘空間才存入並回傳 true，否則整批拒絕、回傳 false、存量不變；`int getCount()`、`int getCapacity()`、`int getRemaining()` 查詢；`int unload()` 回傳卸下份數並把存量歸 0，空盒回傳 0。
-> 不要提供：任何直接改寫存量的方法（例如 setCount）、輸出方法；欄位一律 private。
-> 限制：本週一般 Java class、單一建構子，不用 record、繼承、Lambda、例外處理。
-> 請列出測試呼叫與預期：容量 3 時 store(2)→true／2、store(2)→false／2、store(1)→true／3、unload()→3、再 unload()→0；store(0) 與 store(-1) 都回傳 false；new SampleCase(0) 容量 1、new SampleCase(9) 容量 8；兩個盒子各自存入互不影響。
-> 不得聲稱我已經實測。
-
-### F3 模擬錯誤三選一
-
-選**選項 2**（「固定代碼用 == 就好」）。另外兩個選項也在副本順手驗證過，結果附在表後。
+選第 1 項（刪掉 countCommands 的範圍檢查）。另外也順手驗證了第 2 項：把 `<` 改成 `<=`，用 {0} 測試，結果是 get(1) 拋出 `IndexOutOfBoundsException: Index 1 out of bounds for length 1`，所以第 2 項也應拒絕。
 
 | 證據 | 本人紀錄 |
 |---|---|
-| 選項與預測 | 副本把 isSuccessful 改成 `return result == "成功";`。預測：E1 的 `new String("成功")` 內容相同但參考不同，== 比的是參考，所以 first 會回傳 false；主任務用的是字串常值，可能「碰巧通過」 |
-| 錯誤結果 | E1：`1/14/成功/false`（應為 true）、`2/12/能源不足/false`。同一個副本跑 {1,1,2}，摘要仍是「步數=3, 成功=3」、任務成功，**只看主任務抓不到這個錯** |
-| 最小修正與理由 | 改回 `return "成功".equals(result);`。字串要比內容不是比參考；常值剛好是同一個物件只是巧合，資料來源一改（例如 new String、讀檔、輸入）就會錯 |
-| 修正後結果 | E1：`1/14/成功/true`、`2/12/能源不足/false` |
-| 修正後 {1,1,2} | 6/5/3 任務成功，回放能源 14、8、6，步數=3, 成功=3（完整輸出見 E3） |
-| 修正後 {3,9,0} | 20/0/0 已返回，步數=3, 成功=0, 拒絕=2，指令次數 [1, 0, 0, 1]（完整輸出見 E3） |
+| 選哪種建議與反例；預期行為 | 第 1 項，理由是「指令只有 0–3」。反例 {3,9,0}：日誌也會記錄無效指令 9，預期刪掉檢查後 counts[9] 會越界 |
+| 修改前實際結果/錯誤訊息 | 副本把條件改成 `if (true)`：回放三步正常印出，接著 `ArrayIndexOutOfBoundsException: Index 9 out of bounds for length 4`（at MissionLog.countCommands），指令次數和摘要都沒印出來 |
+| 最小修正與採納/拒絕理由 | 拒絕這個建議。日誌會記錄無效指令，所以 commandLog 裡可能有 9、-1；恢復 `if (command >= 0 && command < counts.length)` 再 `counts[command]++` |
+| 修正後反例實際結果 | {3,9,0}：指令次數[0..3]=[1, 0, 0, 1]、步數=3, 成功=0, 拒絕=2, 略過=0、20/0/0 已返回 |
+| 修正後 {1,1,2} | 6/5/3 任務成功，指令次數=[0, 2, 1, 0]（見 E 的完整輸出） |
+| 修正後 {3,9,0} | 20/0/0 已返回，指令次數=[1, 0, 0, 1]（見 E 的完整輸出） |
 
-另外兩個選項的副本實測：
+## G｜課末檢核與第五週入口
 
-- 選項 1（三欄加 static）：E1 兩行都印 `2/12/能源不足/false`，第一筆被第二筆覆蓋。跑 {1,1,2} 時指令次數變成 [0, 0, 3, 0]（三步都讀到最後一步的指令 2），終態仍是任務成功，所以只看終態抓不到。
-- 選項 3（同一顆電池存兩次）：印出 `19/19`、`同一個物件=true`；正確的 SnapshotDemo 是 14、19、各自獨立的紀錄=true。
+1. length、size()、length() 分別用於什麼：length 是陣列的欄位（不加括號）；size() 是 ArrayList 等集合的筆數方法；length() 是 String 的字元數方法。
+2. 三筆日誌是否必定代表三次成功行動：不一定。{3,9,0} 有三筆日誌，但成功行動 0 次。
+3. 三條清單漏加其中一筆會發生什麼：同一個索引不再代表同一步，回放會錯配；較短的清單在回放時可能 get 越界。
+4. 為何固定四種指令計數用陣列，逐步增加的日誌用 ArrayList：指令種類固定 4 種，長度不會變，陣列直接用指令當索引最簡單；日誌筆數會隨執行增加、事先不知道，ArrayList 可以 add，用 size() 就知道筆數。
+5. 下週如何把同一步三個欄位整合在一起：設計一個類別（例如 MissionStep），把指令、能源、結果當作欄位，用建構子建立，再用一條 ArrayList 保存每一步的物件。本週不寫。
 
-### F4 反思
+## H｜保存、推送與取回
 
-1. 只讀 vs 可改各符合什麼需求？MissionStep 記錄已發生的歷史，沒有改寫需求，所以建立後只讀；SampleCase 的存量本來就會變，但只能經過 store、unload 這兩個守規則的方法改變。
-2. 只測最後能源能證明快照都對嗎？不能。選項 3 錯誤版和正確版的目前能源都是 19；選項 1 錯誤版的終態也還是任務成功。要逐筆讀歷史才抓得到。
-3. 誰負責傳入值與建立時機？呼叫端 MissionLog。private 只限制存取，不會判斷時機；如果在探索「之前」就記下能源 20，值合法、欄位也是 private，歷史仍然記錯。所以 MissionLog 要在行動完成後，才用當步結果建立 MissionStep。
+- 繳交版 MissionLog 維持預設腳本 {1,1,2}，重新編譯執行通過；LAB_REPORT、AI_USAGE、java-04/README.md 已完成。
+- commit、push，核對 GitHub main 最新 commit。
+- 在另一位置 clone，重新編譯並執行 MissionLog。
 
-## G｜課末檢核
+GitHub repo/作業目錄：https://github.com/ShixinHuangZijiao/115_1_JAVA_A112222013 ／ `2026_10_16/`；最終 commit：中文版作業 commit `f56f140`（第四週改用老師新版中文教材）已 push 到 origin/main；本段驗證紀錄另以後續 commit 補上。舊版英文作業的 commit 為 `fba08b3`。
+本人新副本 JDK/編譯/預設輸出：從 GitHub clone 到另一個本機暫存資料夾（原副本未刪），HEAD 為 `f56f140`；JDK 21.0.13.1；在 `2026_10_16/java-04` 執行 `javac -encoding UTF-8 -d out src/*.java` 與 `java -Dstdout.encoding=UTF-8 -cp out MissionLog`，輸出 3 步中文回放（能源 14、8、6）、指令次數[0..3]=[0, 2, 1, 0]、步數=3, 成功=3, 拒絕=0, 略過=0、最低能源=6、最終能源=6, 樣本數=5, 行動次數=3 -> 任務成功、電量百分比=30.0，與預期一致。
 
-1. `MissionStep step` 只宣告參考變數，還沒有物件；`new MissionStep(...)` 才真正建立物件並呼叫建構子。
-2. `this.energy` 是目前物件的欄位；參數 `energy` 是這次呼叫傳進來的值。
-3. main 是 static，屬於類別，JVM 不必 new 就能從這裡開始；MissionStep 的資料不加 static，才能每個物件各自保存一份，否則後建立的會覆蓋前面的。
-4. 不會。add 只存參考，同一個物件 add 兩次是兩個索引指向同一個物件。
-5. MissionStep：保存一筆已發生的任務紀錄。MissionLog：推進腳本、保存歷史、產生報表。RoverBattery：管理目前能源，並只透過規則改變（本週示範用，主任務的能源與樣本仍在 MissionLog）。
-
-## H｜繳交與保存
-
-- 正式 src 保留正確版：欄位不加 static、用 equals、main 的 script 為 {1,1,2}、沒有 E1 暫時輸出。重新編譯執行通過。
-- `java-05/src` 共 8 個 Java 檔（examples 6 檔＋完成的 MissionStep、MissionLog）；`java-05/README.md`、本報告、AI_USAGE.md 已完成。out、.class 由 .gitignore 排除。
-- commit、push 後到遠端核對，另取回新副本重新編譯。
-
-GitHub repo／作業目錄：https://github.com/ShixinHuangZijiao/115_1_JAVA_A112222013 ／ `2026_10_16/`；最終 commit：作業 commit `eff420c`（完成第五週作業）已 push 到 origin/main；本段驗證紀錄另以後續 commit 補上。
-新副本 JDK／編譯／預設輸出：從 GitHub clone 到另一個本機暫存資料夾（原副本未刪），HEAD 為 `eff420c`，src 有 8 個 Java 檔；JDK 21.0.13.1；在 `2026_10_16/java-05` 執行 `javac -encoding UTF-8 -d out src/*.java` 與 `java -Dstdout.encoding=UTF-8 -cp out MissionLog`，回放能源 14、8、6，指令次數[0..3]=[0, 2, 1, 0]，步數=3, 成功=3, 拒絕=0, 略過=0，最低能源=6，最終能源=6, 樣本數=5, 行動次數=3 -> 任務成功，電量百分比=30.0，與預期一致。
-
-## 選做
+## 課後選做
 
 未做。

@@ -1,6 +1,8 @@
 # 第六週實作報告：用類別圖分配責任
 
-姓名：曹臣緯　學號：A112222013　實際上課日期：2026/10/23　實際 JDK：openjdk 21.0.13.1（javac 21.0.13.1，Microsoft Build）
+姓名：曹臣緯　學號：A112222013　實際上課日期：2026/11/13　實際 JDK：openjdk 21.0.13.1（javac 21.0.13.1，Microsoft Build）
+
+> **日期更正（2026-11-27）**：本週資料夾原本命名為 `2026_10_23`，是 AI 依「每週五上課、往後推一週」推算的，沒有考慮 10/09、10/23 放假與實際進度。依本人確認的課表，第六週實際上課日期為 `2026_11_13`，資料夾已用 `git mv` 改名（保留 commit 歷史），報告內的日期與路徑一併更正。
 
 **教材缺件說明**：老師發布的第六週學生教材只有 starter 五檔、AI_USAGE 範本和投影片（`week06_slides_codex_claude.html`），**沒有** student_lab.md、assignment.md、`DESIGN_template.md`、examples 六檔，以及三份練習圖範本。處理方式：
 
@@ -91,7 +93,7 @@ A、B 的欄位指向同一顆 8 格電池：A 用 6 剩 2，B 要 6 被拒絕�
 
 IntelliJ IDEA：本人於 2026-11-27 補做（IntelliJ IDEA 2026.3.0.1，Project SDK 為 JDK 21.0.13）。
 
-1. File → Open 開啟 `2026_10_23/java-06`（不是整個 repo），選 Trust Project；沒有建立新 repo，也沒有選 Maven／Gradle。
+1. File → Open 開啟 `2026_11_13/java-06`（不是整個 repo），選 Trust Project；沒有建立新 repo，也沒有選 Maven／Gradle。
 2. File → Project Structure：Project SDK 為 JDK 21、Language level 為 SDK default；Modules 中 `src` 已是 Sources Root（Source Folders 列出 src）。
 3. 專案樹 `src` 內有 11 個類別；開啟 `MissionLog.java`，點 main 左邊的綠色 ▶ 選 Run 'MissionLog.main()'。MissionStep、Mission、Rover 沒有 main，不是入口。
 
@@ -272,7 +274,7 @@ IDEA 自動產生的 `.idea/` 與 `java-06.iml` 已由 `.gitignore` 排除，沒
 - [x] 三份 `.puml` 都重新產生 `.svg`。
 - [x] `java-06/src` 共 11 檔（starter 五檔＋examples 六檔，examples 為依投影片自行重建）；README.md、DESIGN.md、diagrams 三組圖已完成；out、.class、.idea、*.iml、PlantUML jar 都不提交。
 - [x] commit、push、遠端確認圖可顯示：第六週 commit `2f22ced`（1120）於 2026-11-27 與第七週一起 push 到 origin/main；GitHub 上 `diagrams/*.svg` 以 image/svg+xml 正常提供。圖可顯示只證明能顯示，不證明類別圖正確。
-- [x] 另一位置 clone，重編譯並跑 MissionLog 與 SampleCaseDemo：從 GitHub clone 到另一個本機暫存資料夾（原副本未刪），HEAD 為 `11f202e`；JDK 21.0.13.1；`2026_10_23/java-06/src` 有 11 檔，`javac -encoding UTF-8 -d out src/*.java` 編譯成功。MissionLog 得「最終能源=6, 樣本數=5, 行動次數=3 -> 任務成功」「電量百分比=30.0」；SampleCaseDemo 得 第一次=true, 存量=2／超量存放=false, 存量=2／剛好裝滿=true, 存量=3／卸載=3／空盒卸載=0，與預期一致。
+- [x] 另一位置 clone，重編譯並跑 MissionLog 與 SampleCaseDemo：從 GitHub clone 到另一個本機暫存資料夾（原副本未刪），HEAD 為 `11f202e`；JDK 21.0.13.1；`2026_11_13/java-06/src` 有 11 檔，`javac -encoding UTF-8 -d out src/*.java` 編譯成功。MissionLog 得「最終能源=6, 樣本數=5, 行動次數=3 -> 任務成功」「電量百分比=30.0」；SampleCaseDemo 得 第一次=true, 存量=2／超量存放=false, 存量=2／剛好裝滿=true, 存量=3／卸載=3／空盒卸載=0，與預期一致。
 
 最終 commit：第六週作業 `2f22ced`；本段驗證紀錄另以後續 commit 補上。
 

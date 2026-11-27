@@ -1,10 +1,10 @@
-# 第五週 AI 使用紀錄
+# 第四週 AI 使用紀錄
 
-| 欄位 | 本人紀錄 |
+| 欄位 | 記錄 |
 |---|---|
-| 使用工具／方式 | 真實 AI：Claude Code（Anthropic Claude，桌面版 Code 分頁）。F3 的錯誤建議是老師投影片提供的模擬建議，不是 Claude 的建議 |
-| 目的與提問摘要 | 我請 AI「開始做第五週的作業，老師有時候的作業規範要改什麼檔案你要看清楚」。AI 讀完教材後，發現學期 repo 裡的課程資料是舊版，老師新發布的版本把結果代碼與報表改成繁體中文，所以改用新版；並依投影片確認只需修改 starter 的 MissionStep（TODO 1–3）與 MissionLog（TODO 4–6），examples 只執行不修改。也請 AI 協助 F1 SampleCase 設計卡、F2 審查與 Prompt。F3 選模擬錯誤選項 2（用 == 比字串）。對話截圖見 [CHAT_LOG.md](CHAT_LOG.md) |
-| 建議與本人處理 | AI 的寫法：建構子用 this 保存三欄；getter 回傳欄位；isSuccessful 用 `"成功".equals(result)`；TODO 4 在 switch 之後 `history.add(new MissionStep(command, energy, result))`；TODO 5 用索引 for 與 getter 印中文回放；TODO 6 用 isSuccessful 與 `"返回".equals(...)` 計數。採納，因為和投影片規格與預期輸出一致。模擬建議 `result == "成功"` 拒絕：== 比參考不比內容 |
-| 本人實際驗證 | 全部在本機以 JDK 21.0.13 實際執行：E1 兩物件得 1/14/成功/true、2/12/能源不足/false；六條路線與五筆固定狀態都和投影片表格一致。F3 選項 2 錯誤副本 E1 第一筆變 false，但 {1,1,2} 摘要仍「成功=3」，只看主任務抓不到；改回 equals 後 E1 恢復 true，重測 {1,1,2} 得 6/5/3 任務成功、{3,9,0} 得 20/0/0 已返回。完整輸出見 LAB_REPORT E3、F3 |
+| 使用工具 | Claude Code（Anthropic Claude，桌面版 Code 分頁） |
+| 使用目的與提問摘要 | 我請 AI「開始做第四週的作業」。AI 先讀完 week04 的講義、AI 範本、examples/README、投影片與全部 Java 檔，再把 starter 與五個核心 examples 複製到 `2026_10_16/java-04/src`，在副本完成 MissionLog 的 TODO 1–5，並跑講義 B–F 的實驗。之後做第五週時，AI 發現老師發布了新版教材（結果代碼與報表改成繁體中文，邏輯不變），我請 AI 把第四週改用新版中文教材重做並重測。F2 的資料結構需求 Prompt 寫在 LAB_REPORT F2；F3 選模擬錯誤第 1 項（刪掉 countCommands 的範圍檢查）。對話截圖見 [CHAT_LOG.md](CHAT_LOG.md)。 |
+| AI 建議與本人處理 | TODO 2：switch 後同時 add command、energy、result；TODO 3：一般 for 用同一索引 get 三條清單，印「步驟 i: 指令=…, 結果=…, 能源=…」；TODO 1：加強版 for 走訪，`command >= 0 && command < counts.length` 才累加；TODO 4：frequency 算「成功」「返回」，再算拒絕、略過；TODO 5：isEmpty 時印「最低能源=無紀錄」，否則用 Collections.min。採納，因為與新版講義、投影片的規格一致。模擬建議「刪範圍檢查」拒絕，因為日誌會記錄無效指令；F2 的 int[100] 要補有效筆數與滿載處理才可用，HashSet 拒絕（會去重、不保留順序）。 |
+| 實際驗證結果 | 全部在本機以 JDK 21.0.13 實際執行（新版中文版本）：六條必做路線與五筆固定狀態都和預期一致。F3 反例 {3,9,0} 在刪除檢查後拋出 `ArrayIndexOutOfBoundsException: Index 9 out of bounds for length 4`，恢復後得 指令次數=[1,0,0,1]、拒絕=2、已返回；重測 {1,1,2} 得 6/5/3 任務成功。完整輸出見 LAB_REPORT E 與 F3。 |
 
-AI 的正確宣稱不能代替編譯執行。D2 的 IntelliJ IDEA 圖形介面操作由本人於 2026-11-27 親自補做（AI 只提供操作步驟說明），執行截圖與輸出見 LAB_REPORT D2。
+只記錄實際發生的操作。AI 宣稱正確不能取代編譯執行。

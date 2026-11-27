@@ -1,17 +1,10 @@
-# 第七週AI使用紀錄
+# 第五週 AI 使用紀錄
 
-姓名:曹臣緯 學號：A112222013
-工具及來源：(1) 真實 AI：Claude Code（Anthropic Claude，桌面版 Code 分頁）；(2) 教師模擬：`ai/HeavyRover.java`（教師設計的模擬 AI 錯誤回覆，不是真實對話）
+| 欄位 | 本人紀錄 |
+|---|---|
+| 使用工具／方式 | 真實 AI：Claude Code（Anthropic Claude，桌面版 Code 分頁）。F3 的錯誤建議是老師投影片提供的模擬建議，不是 Claude 的建議 |
+| 目的與提問摘要 | 我請 AI「開始做第五週的作業，老師有時候的作業規範要改什麼檔案你要看清楚」。AI 讀完教材後，發現學期 repo 裡的課程資料是舊版，老師新發布的版本把結果代碼與報表改成繁體中文，所以改用新版；並依投影片確認只需修改 starter 的 MissionStep（TODO 1–3）與 MissionLog（TODO 4–6），examples 只執行不修改。也請 AI 協助 F1 SampleCase 設計卡、F2 審查與 Prompt。F3 選模擬錯誤選項 2（用 == 比字串）。對話截圖見 [CHAT_LOG.md](CHAT_LOG.md) |
+| 建議與本人處理 | AI 的寫法：建構子用 this 保存三欄；getter 回傳欄位；isSuccessful 用 `"成功".equals(result)`；TODO 4 在 switch 之後 `history.add(new MissionStep(command, energy, result))`；TODO 5 用索引 for 與 getter 印中文回放；TODO 6 用 isSuccessful 與 `"返回".equals(...)` 計數。採納，因為和投影片規格與預期輸出一致。模擬建議 `result == "成功"` 拒絕：== 比參考不比內容 |
+| 本人實際驗證 | 全部在本機以 JDK 21.0.13 實際執行：E1 兩物件得 1/14/成功/true、2/12/能源不足/false；六條路線與五筆固定狀態都和投影片表格一致。F3 選項 2 錯誤副本 E1 第一筆變 false，但 {1,1,2} 摘要仍「成功=3」，只看主任務抓不到；改回 equals 後 E1 恢復 true，重測 {1,1,2} 得 6/5/3 任務成功、{3,9,0} 得 20/0/0 已返回。完整輸出見 LAB_REPORT E3、F3 |
 
-## 精簡紀錄
-
-| 使用目的與Prompt摘要（註明來源） | 採納／拒絕與理由 | 本人驗證：預期、實際、證據位置 | 最終修改與commit |
-|---|---|---|---|
-| 【教師模擬】Prompt「請繼承 Rover 新增 drill，耗 8 格得 3 份，並記鑽探次數」；模擬 AI 聲稱父類別欄位 private，所以子類別重新宣告一份 energy、samples | 拒絕：子類別重複宣告同名欄位會讓一個物件有兩份狀態，getter 讀 Rover 那份、drill 改子類別那份；另外沒有檢查停止、沒有計行動次數 | 預測第一次 drill 後 getEnergy 仍為 20。實際 HeavyRoverTry 9 行不符，例如「鑽探後: 20/0/0/1 （預期 12/3/1/1）」「任務完成後鑽探: 成功 （預期 任務已停止）」「能源耗盡後無法充電: 成功」；探查程式讀到 drill 後 Rover 那份 20/0/0、子類別那份 12/3。見 LAB_REPORT E2、E3 | 刪掉重複欄位與建構子設定，drill 改用 isStopped、spendEnergy、addSamples、countAction；重測十五行全相符。`[AI]` commit 0f597ec、`[fix]` commit e551194 |
-| 【真實 AI，Claude Code】我請 AI「開始做第七週的作業」並先確認老師 GitHub 上的最新規定。AI 協助完成 TODO 1–3、執行 B、C、D、E 段實驗、撰寫 CargoRover 與測試、繼承圖與報告 | 採納：spendEnergy 先檢查再扣；explore、scan 改用三個 protected 方法；drill、load 先檢查停止。理由是符合投影片 D2、D4 的規格表，且不重複宣告狀態、不新增 setter、不覆寫 | 本機 JDK 21.0.13 實測：HeavyRoverTry 十五行相符、六條舊路線不變、CargoRoverTry 十二行相符；自己的反例 HeavyRover(8,2) 抓出「只回成功卻沒更新」的錯誤版。見 LAB_REPORT D、遷移段 | D 段 commit fa0c55f；遷移與報告於後續 commit |
-
-## 反思
-
-- 哪個案例讓我發現「回成功卻沒更新正確狀態」：HeavyRoverTry 第一行「鑽探: 成功」是相符的，但第二行「鑽探後: 20/0/0/1」才露出問題——只看回傳字串會被騙，一定要讀 getter。我自己的反例 HeavyRover(8,2) 也是同樣道理：錯誤版回「成功」，狀態卻停在 8/2/0/0。
-- 我保留或拒絕AI建議的理由：拒絕模擬 AI 的「重新宣告一份欄位」，因為 private 不被繼承不代表物件沒有那份資料，重新宣告只會多出第二份；修正時也沒有把欄位改成 protected，而是改用 Rover 提供的 protected 方法，讓規則只放在 Rover。
-- 我仍無法解釋或尚未完成的部分：E5 的補強 Prompt 沒有實際送到其他 AI 服務測試；選做項目未做。
+AI 的正確宣稱不能代替編譯執行。D2 的 IntelliJ IDEA 圖形介面操作由本人於 2026-11-27 親自補做（AI 只提供操作步驟說明），執行截圖與輸出見 LAB_REPORT D2。
