@@ -242,12 +242,103 @@ HeavyRoverTry 十五行全部「相符」：
 - 第一次 `drill()` 之後 `getEnergy()` 讀到多少？預測還是 **20**。getEnergy 寫在 Rover 裡，讀的是 Rover 宣告的那份；AI 的 drill 改的是子類別自己另外宣告的那份（20→12），兩份互不相干。drill 會回「成功」，但 getSamples 仍是 0，行動次數也不會加（沒有呼叫 countAction）。
 - 預測另外兩個問題：drill 沒有檢查停止，初始就達標的車也能「成功」；而且子類別那份能源自己扣，Rover 那份沒扣，原本應該耗盡的車用 execute(3) 還能充電。
 
-E2–E5：待執行後填寫。
+以上預測已在 commit `fa0c55f` 中先提交，之後才執行 AI 版。
+
+### E2 在 ai-check 實際執行
+
+把完成的 Rover、HeavyRoverTry 和**未修改**的 AI HeavyRover 放進 `java-07/ai-check`，單獨編譯（不混正式 src），先用 `[AI]` commit `0f597ec` 保留原文。能編譯，HeavyRoverTry 完整輸出：
+
+```text
+鑽探: 成功 （預期 成功） 相符
+鑽探後: 20/0/0/1 （預期 12/3/1/1） 不符
+探索: 成功 （預期 成功） 相符
+探索後: 14/2/1/1 （預期 6/5/2/1） 不符
+任務完成後鑽探: 成功 （預期 任務已停止） 不符
+完成後狀態維持: 14/2/1/2 （預期 6/5/2/1） 不符
+能源不足: 能源不足 （預期 能源不足） 相符
+能源不足時狀態維持: 7/0/0/0 （預期 7/0/0/0） 相符
+能源剛好足夠: 成功 （預期 成功） 相符
+能源剛好足夠時的狀態: 8/0/0/1 （預期 0/3/1/1） 不符
+能源耗盡後無法充電: 成功 （預期 任務已停止） 不符
+初始能源為零: 能源不足 （預期 任務已停止） 不符
+耗盡後狀態維持: 0/0/0/0 （預期 0/0/0/0） 相符
+初始已達標: 成功 （預期 任務已停止） 不符
+達標後狀態維持: 20/5/0/1 （預期 20/5/0/0） 不符
+```
+
+共 9 行不符。和預測比對：
+
+| 指定行 | 實際 | 和我的預測 |
+|---|---|---|
+| 鑽探後 | 20/0/0/1：回「成功」，但 getter 讀到的能源、樣本、行動數都沒變，只有 drillCount 變 1 | 符合預測：getEnergy 仍是 20，行動次數沒加 |
+| 任務完成後鑽探 | 「成功」：Rover 那份是 14/2 還沒停止；AI 的 drill 沒有檢查停止，用的又是子類別那份 12 格能源 | 符合預測的「沒有停止檢查」；而且因為兩份狀態，連「任務完成」本身都沒發生（Rover 那份樣本只有 2） |
+| 能源耗盡後無法充電 | 「成功」：8 格的車 drill 後，子類別那份變 0，但 Rover 看到的能源仍是 8，所以 execute(3) 充電成功；本來應該已耗盡、回「任務已停止」 | 符合預測 |
+
+### E3 一個物件裡的兩份狀態
+
+用 repo 外的探查程式（反射讀 private 欄位，只用來觀察）追蹤 `new HeavyRover(20, 0)`：
+
+| 動作 | Rover 宣告的 能源/樣本/行動 | AI 子類別另宣告的 能源/樣本 | getter 讀到 |
+|---|---|---|---|
+| 建立 | 20 / 0 / 0 | 20 / 0 | 20 / 0 / 0 |
+| drill()，回「成功」 | 20 / 0 / 0（沒動） | 12 / 3 | 20 / 0 / 0 |
+| execute(1)，回「成功」 | 14 / 2 / 1 | 12 / 3（沒動） | 14 / 2 / 1 |
+
+這是**一台**車、一個物件，不是兩台車，也不是覆寫。`getEnergy()`、`getSamples()` 寫在 Rover 裡，只讀 Rover 那份；AI 的 `drill()` 改的是子類別另外宣告的那份，所以各改各的。
+
+### E4 最小修正（`[fix]` commit `e551194`）
+
+1. 只先刪掉子類別的 `energy`、`samples` 欄位與建構子裡的 `this.energy = …`、`this.samples = …`，編譯出現 3 個錯誤：`energy has private access in Rover`（兩處）、`samples has private access in Rover`。這是提示要改用 Rover 的 protected 方法，不是把欄位改成 protected。
+2. drill 改成先 `isStopped()`，再 `spendEnergy(8)`，成功才 `addSamples(3)`、`countAction()`、`drillCount++`。
+
+重測 ai-check 的 HeavyRoverTry：十五行全部「相符」（與 D5 輸出相同）。正式 src 的 {1,1,2}、{3,9,0} 也重測過，見 D5。
+
+### E5 補強 Prompt
+
+> 請寫一個繼承 Rover 的 HeavyRover，新增 drill()：耗 8 格能源、得 3 份樣本、行動次數加 1，並記錄鑽探次數。Rover 的 energy、samples、actionCount 是 private，**狀態只能有一份**，不可在子類別重新宣告同名欄位，也不要把欄位改成 protected；請改用 Rover 提供的 public 方法 isStopped()、getEnergy()、getSamples()、getActionCount()，以及 protected 方法 spendEnergy(int)、addSamples(int)、countAction()。drill 是新的公開入口、不經過 execute，必須先檢查停止（停止優先，回「任務已停止」）；能源不足回「能源不足」且狀態全部不變。不可覆寫父類別任何方法。請附一個能抓出「只回成功卻沒更新狀態」的反例與預期值。
+
+來源：本 Prompt 是我依教師模擬情境補強的版本，沒有實際送到其他 AI 服務。
+
+## 課後獨立遷移：CargoRover（路線 A）
+
+在 src 新增自己的 `CargoRover.java` 與 `CargoRoverTry.java`。規格與完整測試表見 [DESIGN.md](java-07/DESIGN.md) 第 4 節。CargoRoverTry 完整輸出：
+
+```text
+裝 2: 成功/2 （預期 成功/2） 相符
+再裝 2（只剩 1 格）: 已拒絕/2 （預期 已拒絕/2） 相符
+裝 1 剛好滿載: 成功/3 （預期 成功/3） 相符
+裝 0: 已拒絕/3 （預期 已拒絕/3） 相符
+滿載後再裝 1: 已拒絕/3 （預期 已拒絕/3） 相符
+原有三個 getter: 20/0/0 （預期 20/0/0） 相符
+裝 -1: 已拒絕/0 （預期 已拒絕/0） 相符
+一次裝 3 剛好滿載: 成功/3 （預期 成功/3） 相符
+一次裝 4 超過容量: 已拒絕/0 （預期 已拒絕/0） 相符
+能源耗盡時裝貨: 任務已停止/0 （預期 任務已停止/0） 相符
+已達標時裝貨: 任務已停止/0 （預期 任務已停止/0） 相符
+裝 2 後探索: 成功/14/2/1/2 （預期 成功/14/2/1/2） 相符
+```
+
+涵蓋正常、邊界（剛好滿載、一次裝滿）、拒絕（0、負數、超量）與停止（耗盡、達標）。在 repo 外副本拿掉 load 的停止檢查後，「能源耗盡時裝貨」「已達標時裝貨」變成「成功/1 … 不符」，證明這兩個案例抓得到漏掉停止檢查的錯誤。
 
 ## F｜課末檢核
 
-待填。
+1. private 欄位不被繼承，為什麼 `getEnergy()` 仍讀得到父類別那份狀態？getEnergy 是 Rover 自己的方法，存取的是 Rover 自己宣告的 energy；HeavyRover 物件裡本來就有這份資料，只是子類別的程式不能直接碰。
+2. protected 方法會自動保證 drill 遵守停止與計次嗎？不會。spendEnergy 只管扣能源，countAction 要自己呼叫，停止也要 drill 自己先檢查。
+3. 子類別建構子會繼承父類別建構子嗎？不會，HeavyRover 要寫自己的建構子，再用 `super(energy, samples)` 呼叫 Rover 的。
+4. 同套件其他類別能呼叫 spendEnergy 嗎？能，Java 的 protected 包含同套件。但這樣會繞過行動流程（不會加樣本、計次、記日誌），讓歷史、計次與停止不一致，所以課程限制只在行動方法裡使用。
+5. `HeavyRover.execute(1)` 現在得到幾份？仍是 2 份。本週新增的是 drill（耗 8 得 3），沒有改探索；要讓探索得 3 份需要覆寫，那是第八週的內容，所以本週新增 drill 不算達成「探索得 3 份」。
+
+F2 自查圖：三角形指向父類別 Rover；三個 `#` 方法與程式的 protected 一致；HeavyRover 只列新增成員；Mission 仍關聯 Rover，沒有 Mission→HeavyRover。
+
+F3：課後遷移選 CargoRover，新增 private cargo、load 方法與 super 建構子，規則是容量 3、不耗能源、停止時拒絕。
 
 ## G｜繳交與保存
 
-待填。
+- [x] 重新編譯，跑 MemberDemo、MissionLog、HeavyRoverTry、CargoRoverTry；MissionLog 的 script 為預設 {1,1,2}。
+- [x] `heavy_practice.puml` 與 SVG 同步。
+- [x] `[AI]` 原文（`0f597ec`）與 `[fix]` 修正（`e551194`）兩個 commit 可比較。
+- [x] `java-07/src` 共 11 檔：examples 3＋starter 6＋自己的 CargoRover、CargoRoverTry；`ai-check` 有完成的 Rover、修正後 AI HeavyRover、HeavyRoverTry。out、jar、.idea、*.iml、C 段錯誤副本都不提交。
+- [ ] push 後在 GitHub 核對程式與 SVG：待推送後填寫。
+- [ ] 另一位置 clone，編譯並跑 HeavyRoverTry：待推送後填寫。
+
+IntelliJ IDEA：本週投影片寫「可示範」，非必做；本週沒有用 IDEA 操作。
