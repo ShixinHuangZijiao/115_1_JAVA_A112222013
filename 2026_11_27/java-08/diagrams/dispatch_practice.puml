@@ -1,0 +1,42 @@
+@startuml
+!pragma layout smetana
+skinparam classAttributeIconSize 0
+skinparam defaultFontName Microsoft JhengHei
+skinparam defaultFontSize 20
+skinparam backgroundColor #FBFCFE
+hide circle
+left to right direction
+
+class Rover {
+  - energy : int
+  - samples : int
+  - actionCount : int
+  + execute(command : int) : String
+  - explore() : String
+  # exploreYield() : int
+}
+class HeavyRover {
+  + drill() : String
+  # exploreYield() : int
+  + execute(command : int) : String
+}
+class Mission {
+  - rover : Rover
+  + run(script : int[]) : void
+}
+Rover <|-- HeavyRover
+Mission --> "1" Rover : rover
+note bottom of HeavyRover
+覆寫（@Override）：exploreYield() 回 3，
+execute(int) 把指令 4 交給 drill()，其他用 super.execute
+保留Rover的private explore（不被繼承、不能覆寫）
+end note
+note bottom of Mission
+部分視角：省略其他成員及MissionStep
+Mission不增加HeavyRover型態欄位
+end note
+note bottom of Rover
+explore() 呼叫 exploreYield()，
+執行時依實際物件選版本：一般車 2、重型車 3
+end note
+@enduml
