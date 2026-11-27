@@ -276,6 +276,10 @@ HeavyRoverTry 十五行全部「相符」：
 
 ### E3 一個物件裡的兩份狀態
 
+物件圖（`java-07/diagrams/ai_two_states.puml`，以 PlantUML 產生 SVG）：
+
+![E3 兩份狀態物件圖](java-07/diagrams/ai_two_states.svg)
+
 用 repo 外的探查程式（反射讀 private 欄位，只用來觀察）追蹤 `new HeavyRover(20, 0)`：
 
 | 動作 | Rover 宣告的 能源/樣本/行動 | AI 子類別另宣告的 能源/樣本 | getter 讀到 |

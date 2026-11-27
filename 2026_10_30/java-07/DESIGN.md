@@ -26,6 +26,10 @@
 
 - Rover 的 energy、samples、actionCount 維持 private。子類別透過 `spendEnergy`、`addSamples`、`countAction` 改 Rover 那一份狀態，規則（例如能源不足不扣）只寫在 Rover 一個地方。
 - 子類別如果再宣告一次 energy、samples（E 段模擬 AI 的錯），一個物件裡就有兩份狀態：getter 讀 Rover 那份、子類別方法改自己那份，回傳「成功」卻看不到變化。
+- 下圖是 E 段模擬 AI 版實測的物件狀態（`diagrams/ai_two_states.puml`）：
+
+![ai_two_states](diagrams/ai_two_states.svg)
+
 - protected 方法不會自動保證停止或計次。新的公開入口（drill、load）不經過 execute，必須自己先呼叫 `isStopped()`。
 
 ## 4. 課後獨立遷移：CargoRover（路線 A）

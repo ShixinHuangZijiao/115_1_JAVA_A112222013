@@ -1,0 +1,43 @@
+@startuml
+!pragma layout smetana
+skinparam defaultFontName "Microsoft JhengHei"
+skinparam defaultFontSize 16
+hide circle
+
+title E3｜模擬 AI 版：一個 HeavyRover 物件裡的兩份狀態\nnew HeavyRover(20, 0) 之後，第一次 drill() 回傳「成功」
+
+object "h : HeavyRover（只有這一個物件）" as h {
+  ── Rover 宣告的欄位 ──
+  energy = 20
+  samples = 0
+  actionCount = 0
+  ── AI 子類別另外宣告的欄位 ──
+  energy = 12
+  samples = 3
+  drillCount = 1
+}
+
+note left of h
+  **Rover 的方法**
+  getEnergy()、getSamples()、
+  getActionCount()、isStopped()、execute()
+  只讀寫 **Rover 宣告的那份**
+  → getter 讀到 20/0/0
+end note
+
+note right of h
+  **AI 子類別的 drill()**
+  只改 **子類別另外宣告的那份**
+  energy 20 → 12、samples 0 → 3
+  沒呼叫 countAction，也沒檢查停止
+end note
+
+note bottom of h
+  實測（repo 外探查程式讀出 private 欄位的值）：
+  建立：Rover 那份 20/0/0，子類別那份 20/0
+  drill() 後：Rover 那份 20/0/0（沒動），子類別那份 12/3
+  execute(1) 後：Rover 那份 14/2/1，子類別那份 12/3（沒動）
+  子類別宣告同名欄位不會取代父類別的欄位，而是多出一份；
+  這不是兩台車，也不是覆寫。
+end note
+@enduml
