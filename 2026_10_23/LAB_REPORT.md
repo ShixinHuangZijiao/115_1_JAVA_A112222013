@@ -1,6 +1,6 @@
 # 第六週實作報告：用類別圖分配責任
 
-姓名：待填　學號：A112222013　實際上課日期：2026/10/23　實際 JDK：openjdk 21.0.13.1（javac 21.0.13.1，Microsoft Build）
+姓名：曹臣緯　學號：A112222013　實際上課日期：2026/10/23　實際 JDK：openjdk 21.0.13.1（javac 21.0.13.1，Microsoft Build）
 
 **教材缺件說明**：老師發布的第六週學生教材只有 starter 五檔、AI_USAGE 範本和投影片（`week06_slides_codex_claude.html`），**沒有** student_lab.md、assignment.md、`DESIGN_template.md`、examples 六檔，以及三份練習圖範本。處理方式：
 

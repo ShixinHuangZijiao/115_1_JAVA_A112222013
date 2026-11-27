@@ -1,6 +1,6 @@
 # 第五週實作報告：把任務日誌設計成物件
 
-姓名：待填　學號：A112222013　實際上課日期：2026/10/16　實際 JDK：openjdk 21.0.13.1（javac 21.0.13.1，Microsoft Build）
+姓名：曹臣緯　學號：A112222013　實際上課日期：2026/10/16　實際 JDK：openjdk 21.0.13.1（javac 21.0.13.1，Microsoft Build）
 
 **教材版本說明**：學期 repo 內的課程資料（`115_1_Java_student-main/`）是舊版。本週改用老師最新發布的教材：結果代碼與報表都改成繁體中文，投影片也換成 `week05_slides_codex_claude.html`。本週教材沒有 student_lab.md 與 assignment.md，所以本報告依投影片的講義題號 A–H 整理。
 

@@ -1,6 +1,6 @@
 # 第七週AI使用紀錄
 
-姓名／學號：待填／A112222013
+姓名:曹臣緯 學號：A112222013
 工具及來源：(1) 真實 AI：Claude Code（Anthropic Claude，桌面版 Code 分頁）；(2) 教師模擬：`ai/HeavyRover.java`（教師設計的模擬 AI 錯誤回覆，不是真實對話）
 
 ## 精簡紀錄

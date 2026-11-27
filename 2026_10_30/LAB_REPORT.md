@@ -1,6 +1,6 @@
 # 第七週實作報告：繼承與新增能力
 
-姓名：待填　學號：A112222013　實際上課日期：2026/10/30　實際 JDK：openjdk 21.0.13.1（javac 21.0.13.1，Microsoft Build）
+姓名：曹臣緯　學號：A112222013　實際上課日期：2026/10/30　實際 JDK：openjdk 21.0.13.1（javac 21.0.13.1，Microsoft Build）
 
 **教材說明**：老師的課程 repo（shuochenghu/115_1_Java_student）最新 commit 為 2026-11-19「修改week8」，與本機下載版本相同。第七週教材有 examples、starter、ai、diagrams 與投影片 `week07_slides_codex_claude.html`，但沒有 student_lab.md、assignment.md、DESIGN_template.md，本報告依投影片的講義題號 A–G 整理。
 
