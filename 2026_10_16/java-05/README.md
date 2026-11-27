@@ -51,4 +51,5 @@ java -Dstdout.encoding=UTF-8 -cp out MissionLog
 ## 完成／未完成項目
 
 - 完成：MissionStep TODO 1–3、MissionLog TODO 4–6；E1 兩物件檢查；六條路線；B3 兩種編譯錯誤；C1 對照；F1 設計卡；F2 審查與 Prompt；F3 選項 2（另兩項也驗證過）。
-- 未完成：D2 IntelliJ IDEA 圖形介面操作（待補）；選做的 SampleCase 實作。
+- 完成（2026-11-27 補做）：D2 用 IntelliJ IDEA 2026.3.0.1 開啟 java-05 並從 SnapshotDemo 執行。
+- 未完成：選做的 SampleCase 實作。

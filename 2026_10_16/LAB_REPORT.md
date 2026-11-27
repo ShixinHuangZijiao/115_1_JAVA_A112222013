@@ -94,7 +94,27 @@
 
 ### D2 IntelliJ IDEA
 
-待補：本機沒有用 IntelliJ IDEA 的圖形介面實際操作，SnapshotDemo 是用終端機執行的（見 D3）。依投影片規定，未實際用 GUI 操作就寫待補，不能用終端機結果代替。
+本人於 2026-11-27 補做（IntelliJ IDEA 2026.3.0.1，Project SDK 為 JDK 21.0.13）：
+
+1. 從 IDEA 歡迎畫面按 Open，開啟 `2026_10_16/java-05`（不是整個 repo），選 Trust Project。
+2. File → Project Structure → Project：SDK 為「21 java version "21.0.13"」，Language level 為 SDK default，Compiler output 為 `java-05\out`。
+3. Modules：java-05 模組已存在，`src` 為藍色、列在 Source Folders，IDEA 自動標好 Sources Root，不需修改。
+4. 開啟 `src/SnapshotDemo.java`，點 main 左邊的綠色 ▶ 選 Run 'SnapshotDemo.main()'。
+
+Run 視窗輸出：
+
+```text
+指令=1, 能源=14
+指令=3, 能源=19
+目前能源=19
+各自獨立的紀錄=true
+
+Process finished with exit code 0
+```
+
+與 D3 的終端機結果一致。IDEA 自動產生的 `.idea/` 與 `java-05.iml` 已由 `.gitignore` 排除，沒有提交。
+
+![IntelliJ IDEA 執行 SnapshotDemo](images/idea_snapshotdemo.png)
 
 ### D3 SnapshotDemo
 
