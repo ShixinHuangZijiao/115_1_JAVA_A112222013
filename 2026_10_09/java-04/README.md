@@ -25,10 +25,12 @@ javac -encoding UTF-8 -d out src/*.java
 java -cp out MissionLog
 ```
 
-若 Windows 主控台中文顯示成亂碼，加上 `-Dstdout.encoding=UTF-8`：
+在 Windows 的 PowerShell 或命令提示字元直接執行即可，Java 會配合主控台編碼正常顯示中文。**不要**另外加 `-Dstdout.encoding=UTF-8`：在預設的繁體中文主控台（CP950）反而會變成亂碼。
+
+若 `java`、`javac` 不在 PATH，改用 JDK 完整路徑，例如：
 
 ```powershell
-java -Dstdout.encoding=UTF-8 -cp out MissionLog
+& "C:\Program Files\Microsoft\jdk-21.0.13.102-hotspot\bin\java.exe" -cp out MissionLog
 ```
 
 ## 預設腳本 {1, 1, 2} 的預期輸出

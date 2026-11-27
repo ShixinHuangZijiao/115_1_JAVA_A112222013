@@ -40,7 +40,13 @@ javac -encoding UTF-8 -d out-ai ai-check/*.java
 java -cp out-ai HeavyRoverTry
 ```
 
-若 Windows 主控台中文顯示成亂碼，`java` 後面加上 `-Dstdout.encoding=UTF-8`。
+在 Windows 的 PowerShell 或命令提示字元直接執行即可，Java 會配合主控台編碼正常顯示中文。**不要**另外加 `-Dstdout.encoding=UTF-8`：在預設的繁體中文主控台（CP950）反而會變成亂碼。
+
+若 `java`、`javac` 不在 PATH，改用 JDK 完整路徑，例如：
+
+```powershell
+& "C:\Program Files\Microsoft\jdk-21.0.13.102-hotspot\bin\java.exe" -cp out HeavyRoverTry
+```
 
 預期：HeavyRoverTry 十五行、CargoRoverTry 十二行全部「相符」；MissionLog 最後一行附近為 `最終能源=6, 樣本數=5, 行動次數=3 -> 任務成功`。
 
