@@ -487,8 +487,8 @@ DrillMissionTry 14 行全部「相符」：
 
 - [x] 正式 src 重新編譯；MemberDemo、MissionLog、HeavyRoverTry、CompareMissions、DrillMissionTry 符合規格。
 - [x] README.md 寫 main 入口、JDK、完成度；dispatch_practice 的 puml 與 SVG 同步；缺項據實標示。
-- [ ] commit、push、GitHub 核對：本人要求先檢查，尚未 commit。
-- [ ] 原 repo 以外的新位置 clone，編譯 java-08/src、執行 CompareMissions：待推送後進行。
+- [x] commit、push、GitHub 核對：本人先用 VS Code、IntelliJ IDEA 檢查後才同意 commit。依序 `9929f2b`（D 段）→ `03ec6f6`（[AI]）→ `dc45890`（[fix]）→ `bfc7b2a`（報告補 E4），2026-11-27 push 到 origin/main；GitHub 上 `diagrams/dispatch_practice.svg` 正常提供。
+- [x] 原 repo 以外的新位置 clone，編譯 java-08/src、執行 CompareMissions：clone 到另一個本機暫存資料夾（原副本未刪），HEAD 為 `bfc7b2a`，src 有 11 檔，`.idea`、`*.iml` 沒有進 repo。CompareMissions 印出一般車「最終能源=6, 樣本數=5, 行動次數=3 -> 任務成功」、重型車「最終能源=8, 樣本數=6, 行動次數=2 -> 任務成功」；另外 HeavyRoverTry 15/15、DrillMissionTry 14/14、BoundaryTry 5/5、SurveyRoverTry 8/8、ai-check 的 HeavyRoverTry 15/15 全部相符，MemberDemo 輸出正確。
 - [x] ai-check 單獨編譯與重測：`[AI]` 原稿 2 行不符，`[fix]` 修正後 15 行相符；out、.class、IDE 暫存（.idea、*.iml）不提交。
 
 ### IntelliJ IDEA（本人操作，2026-11-27）
